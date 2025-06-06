@@ -1,0 +1,79 @@
+{% extends 'trackingtalibe/base.html' %}
+
+{% block content %}
+<div class="container mt-2">
+    <h2>Bienvenue {{ user.first_name }} {{ user.last_name }}</h2>
+
+<a href="{% url 'associer_par_code' %}" class="btn btn-primary mt-3">
+    Demander une association à un enfant
+</a>
+<small class="text-muted d-block mt-1">⚠️ L'association doit être validée par le Serigne Daara</small>
+</div>
+<div class="container mt-1" style="margin-bottom: 2%;">
+      <div class="mb-0" style="width: 15rem;">
+          <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par Nom">
+      </div>
+<div class="shadow rounded p-2 mb-2" style="min-height: 350px; max-height: 400px; overflow-y: auto; background-color: rgba(255, 255, 255, 0.9); font-size:x-small;">
+  <div class="card-header bg-dark text-white">
+    <h6 class="mb-0 text-center">Liste des enfants que vous pouvez suivre</h6><br>
+  </div>
+  <div class="card-body p-0">  
+  <table class="table table-striped table-hover align-middle">
+        <thead class="sticky-top table-dark">
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Date de naissance</th>
+            <th>Résidance</th>
+            <th>Suivi</th>
+          </tr>
+          
+        </thead>
+        <tbody>
+          {% for enfant in enfants %}
+            <tr>
+              <td>{{ enfant.nom }}</td>
+              <td>{{ enfant.prenom }}</td>
+              <td>{{ enfant.date_naissance }}</td>
+              <td>Daara {{enfant.responsable.nom_daara}}</td>
+              <td>
+                {% if enfant.appareil %}
+                  <a href="{% url 'suivre_enfant' enfant.id %}">Suivre</a>
+                {% else %}
+                  Appareil non connecté
+                {% endif %}
+              </td>
+            </tr>
+             {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">Aucun enfant enregistré pour l’instant.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const searchInput = document.getElementById('searchInput');
+      const rows = document.querySelectorAll('table tbody tr');
+
+      function normalize(text) {
+          return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+      }
+
+      searchInput.addEventListener('keyup', function () {
+          const searchTerm = normalize(this.value);
+
+          rows.forEach(row => {
+              const nom = normalize(row.children[0].innerText);
+              const prenom = normalize(row.children[1].innerText);
+
+              const match = nom.startsWith(searchTerm);
+              row.style.display = match ? '' : 'none';
+          });
+      });
+  });
+</script>
+</div>
+{% endblock %}

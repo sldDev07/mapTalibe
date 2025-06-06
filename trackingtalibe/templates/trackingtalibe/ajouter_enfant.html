@@ -1,0 +1,21 @@
+{% extends 'trackingtalibe/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center" style="margin-bottom: 3%;">
+    <div class="card bg-dark text-white" style="width: 20rem;">
+        <div class="card-header text-center" style="background-color: rgb(35, 163, 223); color: black;">
+            <h3>Ajouter un enfant</h3>
+        </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid container" style="width: 10rem;">
+                        <button type="submit" class="btn btn-success ">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+</div>
+</div>
+{% endblock %}

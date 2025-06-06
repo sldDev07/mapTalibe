@@ -1,0 +1,53 @@
+{% extends 'trackingtalibe/base.html' %}
+{% block title %}Suivi de {{ enfant.nom }} {{ enfant.prenom }}{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Suivi de {{ enfant.nom }} {{ enfant.prenom }}</h2>
+
+<div id="map" style="height: 500px; border: 2px solid #ccc; margin-bottom: 2rem;"></div>
+
+<script>
+    console.log("Initialisation de la carte Leaflet...");
+
+    var enfantId = {{ enfant.id }};
+    var map = L.map('map').setView([14.685, -17.4494], 16);
+
+    // Tuile Mapbox
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    id: 'mapbox/satellite-streets-v11',  // 🔁 style satellite + labels
+    tileSize: 512,
+    zoomOffset: -1,
+    maxZoom: 18,
+    accessToken: 'pk.eyJ1Ijoic2xkMDciLCJhIjoiY21iNzd6czAxMDdxYjJqczFiOWgxajI0biJ9.cT9ueN4meMGQFRMZ6Q5GJg',
+    attribution: '© <a href="https://www.mapbox.com/">Mapbox</a>'
+}).addTo(map);
+    // Icône personnalisée
+    var customIcon = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
+    var marker = L.marker([14.685 , -17.4494], { icon: customIcon }).addTo(map);
+    marker.bindPopup("{{ enfant.nom }} {{ enfant.prenom }}").openPopup();
+
+    function updatePosition() {
+        fetch(`/enfant/${enfantId}/position/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.latitude && data.longitude) {
+                    var latlng = [data.latitude, data.longitude];
+                    marker.setLatLng(latlng);
+                    map.setView(latlng, 16);
+                    marker.openPopup();
+                } else {
+                    console.warn("Coordonnées non disponibles pour cet enfant.");
+                }
+            })
+            .catch(error => console.error('Erreur de mise à jour de la position :', error));
+    }
+
+    updatePosition();
+    setInterval(updatePosition, 5000);
+</script>
+{% endblock %}

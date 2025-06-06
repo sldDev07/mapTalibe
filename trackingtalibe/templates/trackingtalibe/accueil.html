@@ -1,0 +1,11 @@
+{% extends 'trackingtalibe/base.html' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="margin-bottom: 3%; color: black; background-color: rgba(255, 255, 255, 0.719); height: 15rem; width: 50%;">
+    <h5>Avec MapTalibé, la suivi des enfants talibés devient une facilité.</h5><br><br><br>
+    <a href="{% url 'login' %}" class="btn btn-primary m-2">Se connecter</a> ou
+    <a href="{% url 'register' %}" class="btn btn-primary m-2">S'inscrire</a>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'trackingtalibe/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container mt-2 d-flex justify-content-center" style="margin-bottom: 3%;">
+    <div class="card bg-dark text-white" style="width: 25rem; font-size: x-small;">
+        <div class="card-header text-white text-center" style="background-color: rgb(35, 163, 223);">
+            <h3>Inscription</h3>
+        </div>
+        <div class="card-body" style="font-size: smaller;">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="role_selection" class="form-label">Type de compte :</label>
+                    <select name="role_selection" id="role_selection" class="form-select" onchange="this.form.submit()">
+                        <option value="parent" {% if role_selected == 'parent' %}selected{% endif %}>Parent</option>
+                        <option value="serigne" {% if role_selected == 'serigne' %}selected{% endif %}>Serigne Daara</option>
+                        <option value="ndeye" {% if role_selected == 'ndeye' %}selected{% endif %}>Ndèye Daara</option>
+                    </select>
+                </div>
+                {{ form|crispy }}
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">S'inscrire</button><br>
+                    <p class="text-center">ou</p>
+                    <a href="{% url 'login' %}" class="text-center">Se connecter</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
