@@ -1,11 +1,122 @@
 {% extends 'trackingtalibe/base.html' %}
+{% load static %}
 
 {% block title %}Accueil{% endblock %}
 
 {% block content %}
-<div class="container text-center" style="margin-bottom: 3%; color: black; background-color: rgba(255, 255, 255, 0.719); height: 15rem; width: 50%;">
-    <h5>Avec MapTalibé, la suivi des enfants talibés devient une facilité.</h5><br><br><br>
-    <a href="{% url 'login' %}" class="btn btn-primary m-2">Se connecter</a> ou
-    <a href="{% url 'register' %}" class="btn btn-primary m-2">S'inscrire</a>
+<style>
+    .accueil-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 100px 110px;
+        background-color: rgba(230, 224, 224, 0.973);
+        color: #000;
+        flex-wrap: wrap;
+    }
+
+    .accueil-text {
+        flex: 1;
+        max-width: 600px;
+    }
+
+    .accueil-text h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .accueil-text p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .accueil-button {
+        display: inline-block;
+        background-color: #2634f0;
+        color: rgb(255, 255, 255);
+        padding: 12px 24px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .accueil-button:hover {
+        background-color: #0289f7;
+    }
+
+    .accueil-image {
+        flex: 1;
+        max-width: 600px;
+        margin-left: 40px;
+        text-align: center;
+    }
+
+    #carousel-image {
+        width: 100%;
+        max-width: 100%;
+        transition: opacity 1s ease-in-out;
+    }
+
+    @media screen and (max-width: 768px) {
+        .accueil-section {
+            flex-direction: column;
+            padding: 40px 20px;
+        }
+
+        .accueil-image {
+            margin-left: 0;
+            margin-top: 30px;
+        }
+    }
+</style>
+
+<div class="accueil-section">
+    <div class="accueil-text">
+        <h1 class="text-center" style="color: #3542f5;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+            </svg>
+            Bienvenue sur MapTalibé
+        </h1>
+        <h4>MapTalibé, le lien de confiance entre daaras et familles</h4>
+        <p>
+            Avec notre plateforme de suivi MapTalibé, accédez à une interface innovante de géolocalisation
+            conçue pour renforcer la sécurité des talibés et la transparence entre Serigne Daara,
+            Ndèye Daara et Parents.
+        </p>
+        <p>
+            Chaque jour, des milliers de talibés arpentent les rues, parfois loin de leurs daaras,
+            exposés à des risques. Face à cela, nous avons imaginé une solution simple et efficace.
+        </p>
+        <a href="{% url 'login' %}" class="accueil-button">Connectez-vous dès maintenant !</a>
+    </div>
+
+    <div class="accueil-image">
+        <img id="carousel-image" src="{% static 'images/talibe1.png' %}" alt="Talibe MapTalibé">
+    </div>
 </div>
+
+<script>
+    const images = [
+        "{% static 'images/talibe.png' %}",
+        "{% static 'images/talibe1.png' %}",
+        "{% static 'images/talibe2.png' %}"
+    ];
+
+    let index = 0;
+    const imgElement = document.getElementById('carousel-image');
+
+    setInterval(() => {
+        imgElement.style.opacity = 0;
+        setTimeout(() => {
+            index = (index + 1) % images.length;
+            imgElement.src = images[index];
+            imgElement.style.opacity = 1;
+        }, 1000);
+    }, 5000);
+</script>
 {% endblock %}

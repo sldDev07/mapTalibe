@@ -43,6 +43,7 @@ class Enfant(models.Model):
     parrains = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='enfants_parrains', blank=True)
     appareil = models.OneToOneField('Device', on_delete=models.SET_NULL, null=True, blank=True)
 
+
     def __str__(self):
         return f"{self.nom} {self.prenom}"
 

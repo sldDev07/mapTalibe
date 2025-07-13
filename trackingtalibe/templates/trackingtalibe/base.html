@@ -3,67 +3,230 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}MapTalibé{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       crossorigin=""/>
-          <style>
-        html, body {
-            height: 100%;
-        }
-
-        #map {
-            height: 500px;
-        }
-    </style>
        <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         crossorigin="">
     </script>
-</head>
-<body style="background-image: url('{% static 'images/fonds.jpg' %}');">
-    <nav class="navbar navbar-expand-lg" style="height: 22rem; background-image: url('{% static 'images/map_talibe.png' %}'); background-size: 100% 50%; background-repeat: no-repeat; background-attachment: fixed;">
-        <div class="container sticky-top" style="background-color:  rgb(35, 163, 223); margin-bottom: 19.5rem;">
-            <a class="navbar-brand btn btn-link btn-outline-info" href="{% url 'accueil' %}" style="color: rgb(0, 0, 0); font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: rgb(253, 242, 140);">MapTalibé</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-link btn-outline-info" href="{% url 'redirection_espace' %}" style="color: rgb(0, 0, 0);" >Tableau de bord</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-link btn-outline-info" href="{% url 'a_propos' %}" style="color: rgb(0, 0, 0);">À propos</a>
-                        </li>                        
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'deconnexion' %}">
-                             {% csrf_token %}
-                                <button type="submit" class="nav-link btn btn-link btn-outline-info" style="color: rgb(0, 0, 0);" >
-                                    Déconnexion
-                                </button>
-                            </form>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-link btn-outline-info" style="color: rgb(0, 0, 0);" href="{% url 'login' %}">Connexion</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-link btn-outline-info" style="color: rgb(0, 0, 0);" href="{% url 'register' %}">Inscription</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-link btn-outline-info" style="color: rgb(0, 0, 0);" href="{% url 'a_propos' %}">À propos</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+<style>
+  /* Pour écrans de moins de 768px */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 56px;
+    }
+    main {
+      margin-left: 56px;
+    }
+  }
 
-    <main class="container mt-4">
-        {% block content %}{% endblock %}
-    </main>
+  /* Pour les écrans plus larges */
+  @media (min-width: 768px) {
+    .sidebar {
+      width: 16.6667%; /* correspond à col-md-2 */
+    }
+    main {
+      margin-left: 16.6667%;
+    }
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    overflow-x: hidden;
+    transition: width 0.3s ease;
+  }
+  .navbar-top-fixed {
+  top: 0;
+  z-index: 1050;
+  height: 60px;
+}
+
+/* Mobile : sidebar = 56px */
+@media (max-width: 768px) {
+  .navbar-top-fixed {
+    left: 56px;
+    width: calc(100% - 56px);
+  }
+}
+
+/* Desktop : sidebar = ~16.6667% */
+@media (min-width: 768px) {
+  .navbar-top-fixed {
+    left: 16.6667%;
+    width: calc(100% - 16.6667%);
+  }
+}
+.navbar-top-fixed {
+  top: 0;
+  z-index: 1050;
+  width: 100%;
+  left: 0;
+}
+
+.navbar-brand {
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav .nav-link {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .navbar-brand svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+/* Appliquer le margin-left uniquement si l’utilisateur est connecté */
+@media (min-width: 768px) {
+  #main-content-auth {
+    margin-left: 16.6667%; /* correspond à col-md-2 */
+  }
+}
+
+@media (max-width: 768px) {
+  #main-content-auth {
+    margin-left: 3.5rem; /* pour le petit menu latéral sur mobile */
+  }
+}
+
+#main-content-public {
+  margin-left: 0 !important;
+}
+
+</style>
+
+</head>
+<body class="d-flex flex-column min-vh-100" style="background-image: url('{% static 'images/fonds.jpg' %}');">
+    {% if user.is_authenticated %}
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-2 col-md-2 bg-dark sidebar px-2" style="min-height: 100vh; position: fixed;">
+      <div class="position-sticky pt-4 text-center">
+        <a href="{% url 'redirection_espace' %}" class="d-flex flex-column align-items-center text-decoration-none text-white mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: rgb(138, 214, 245);">MapTalibé</span>
+        </a>
+        <ul class="nav flex-column text-white" style="font-size: small;">
+          <li class="nav-item mb-3">
+            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'redirection_espace' %}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-columns-gap" viewBox="0 0 16 16">
+                <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
+              </svg>
+              <span class="d-none d-md-inline mt-1">Tableau de bord</span>
+            </a>
+          </li>
+
+          <li class="nav-item mb-3">
+            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'accueil' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                  <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
+                </svg>
+              <span class="d-none d-md-inline mt-1">Accueil</span>
+            </a>
+          </li>
+
+          <li class="nav-item mb-3">
+            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'changer_mot_de_passe' %}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+              </svg>
+              <span class="d-none d-md-inline mt-1">Changer mot de passe</span>
+            </a>
+          </li>
+
+          <li class="nav-item  mb-2" style="margin-top: 250px;">
+            <h6 class="text-white d-flex flex-column align-items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+              </svg>
+              <span class="d-none d-md-inline mt-1">{{ user.first_name }} {{ user.last_name }}</span>
+            </h6>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+<div>
+    <nav class="navbar navbar-expand-lg navbar-top-fixed position-fixed px-3" style="margin-left: 226px; background-color: rgb(243, 242, 242)">
+      <div>
+        <ul class="navbar-nav" style="margin-left: 940px;">
+          <li class="nav-item">
+            <form method="post" action="{% url 'deconnexion' %}">
+              {% csrf_token %}
+              <button type="submit" class="nav-link text-dark btn btn-link btn-outline-info">
+                Déconnexion
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                  <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                </svg>
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </nav>
+</div>
+   {% else %}
+<nav class="navbar navbar-expand-lg navbar-top-fixed position-fixed w-100 px-3" style="top: 0; z-index: 1050; background-color: rgb(243, 242, 242);">
+  <div class="container-fluid justify-content-between align-items-center">
+
+    <a class="navbar-brand d-flex align-items-center btn btn-link btn-outline-primary" href="{% url 'accueil' %}" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: #3542f5;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+      </svg>
+      <span class="ms-1" style="font-size: x-large;">MapTalibé</span>
+    </a>
+
+    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGuest" aria-controls="navbarGuest" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarGuest" style=" margin-left: 300px;">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'accueil' %}">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'login' %}">Connexion</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'register' %}">Inscription</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endif %}
+
+{% if user.is_authenticated %}
+<main id="main-content-auth" style="transition: margin-left 0.3s ease; margin-top: 30px;">
+{% else %}
+<main class="d-flex justify-content-center align-items-center w-100" id="main-content-public" style="min-height: 100vh; margin-top: 30px;">
+{% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
-    <footer>
-       <h6 style="font-style: italic;" class="text-center p-2">Copyright © 2025 MapTalibé.</h6>
+    <footer class="text-center">
+        <h6 style="font-style: italic;">
+            Copyright © 2025 MapTalibé.
+        </h6>
     </footer>
 </html>

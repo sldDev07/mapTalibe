@@ -1,0 +1,14 @@
+{
+  "test": {
+    "latitude": 0,
+    "longitude": 0,
+    "timestamp": "2025-07-11T19:57:29.517773",
+    "alert_sent": false
+  },
+  "78:42:1C:6C:B2:54": {
+    "latitude": 14.69613838,
+    "longitude": -16.4785862,
+    "timestamp": "2025-07-10T18:42:10.345398",
+    "alert_sent": false
+  }
+}

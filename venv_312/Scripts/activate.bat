@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\Django\mapTalibe\venv_312
+set VIRTUAL_ENV=D:\Django\Geo\venv_312
 
 if not defined PROMPT set PROMPT=$P$G
 

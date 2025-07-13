@@ -2,20 +2,29 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center" style="margin-bottom: 3%;">
-    <div class="card bg-dark text-white" style="width: 20rem;">
+<div class="container d-flex justify-content-center" style="margin-bottom: 3%; margin-top: 100px;">
+    <div class="card bg-dark text-white" style="width: 40rem;">
         <div class="card-header text-center" style="background-color: rgb(35, 163, 223); color: black;">
-            <h3>Ajouter un enfant</h3>
+            <h3>Ajouter un talibé</h3>
         </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <div class="d-grid container" style="width: 10rem;">
-                        <button type="submit" class="btn btn-success ">Enregistrer</button>
-                    </div>
-                </form>
-            </div>
-</div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    {% for field in form.visible_fields %}
+                        {% if forloop.counter0|divisibleby:2 and not forloop.first %}
+                            </div><div class="row">
+                        {% endif %}
+                        <div class="col-md-6 mb-3">
+                            {{ field|as_crispy_field }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid container" style="width: 10rem;">
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -10,7 +10,6 @@ from .views import (
 
 urlpatterns = [
     path('accueil/', views.accueil, name='accueil'),
-    path('a_propos/', views.a_propos, name='a_propos'),
     path('register/', views.register, name='register'),
     path('login/', views.login_view, name='login'),
     path('redirection_espace/', views.redirection_espace, name='redirection_espace'),
@@ -30,11 +29,10 @@ urlpatterns = [
     path('mot-de-passe/reinitialiser/envoye/', CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('mot-de-passe/reinitialiser/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('mot-de-passe/reinitialiser/complet/', CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    path('api/coordonnees/', views.recevoir_contacts, name='recevoir_coordonnees'),
     path('register_device/', views.registrer_appareil, name='register_device'),
     path('gestion-associations/', views.gestion_associations, name='gestion_associations'),
     path('demande/<int:demande_id>/accepter/', views.accepter_demande, name='accepter_demande'),
     path('demande/<int:demande_id>/refuser/', views.refuser_demande, name='refuser_demande'),
     path('dissocier/<int:enfant_id>/<int:utilisateur_id>/', views.dissocier_utilisateur, name='dissocier_utilisateur'),
-
+    path('changer-mot-de-passe/', views.changer_mot_de_passe, name='changer_mot_de_passe'),
 ]

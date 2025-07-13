@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from .forms import EnfantForm,InscriptionForm, AssocierEnfantViaESP32Form
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from .models import Enfant, Device, DeviceToken, DemandeAssociation, CustomUser
 from django.contrib import messages
@@ -12,13 +12,14 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import json, os
-
-
+from datetime import datetime
+from twilio.rest import Client
+from math import radians, cos, sin, asin, sqrt
+from geopy.distance import distance  
+from django.contrib.auth import update_session_auth_hash
 
 def accueil(request):
     return render(request, 'trackingtalibe/accueil.html')
-def a_propos(request):
-    return render(request, 'trackingtalibe/a_propos.html')
 
 def register(request):
     role_selected = request.POST.get('role_selection', None)
@@ -65,7 +66,7 @@ def redirection_espace(request):
     elif request.user.role == 'parent':
         return redirect('espace_parent')
     else:
-        return redirect('accueil')
+        return redirect('login_view')
 @login_required
 def espace_serigne(request):
     if request.user.role != 'serigne':
@@ -141,49 +142,130 @@ def associer_par_code(request):
 })
 
 
+# Config Twilio
+Twilio_SID = settings.TWILIO_SID
+Twilio_TOKEN = settings.TWILIO_TOKEN
+Twilio_NUMERO = settings.TWILIO_NUMERO
+
+# Position du Daara
+LAT = settings.DAARA_LAT
+LON = settings.DAARA_LON
+RAYON_SECURITE = settings.RAYON_SECURITE_METRES
+
+
+def envoyer_alerte_sms(enfant, lat, lon):
+    url_suivi = f"https://maptalibe.com/enfant/{enfant.id}/suivre/"
+    
+    msg = (
+        f"Alerte : {enfant.nom} {enfant.prenom} a quitté le périmètre du Daara. "
+        f"Suivez sa position ici : {url_suivi}"
+    )
+
+    client = Client(Twilio_SID, Twilio_TOKEN)
+
+    contacts = set()
+    if enfant.responsable and enfant.responsable.téléphone:
+        contacts.add(enfant.responsable.téléphone)
+    contacts.update(enfant.parents.values_list('téléphone', flat=True))
+    contacts.update(enfant.parrains.values_list('téléphone', flat=True))
+
+    for numero in contacts:
+        if numero:  # Vérifie que le numéro existe
+            client.messages.create(
+                body=msg,
+                from_=Twilio_NUMERO,
+                to=numero
+            )
 
 @csrf_exempt
 def enregistrer_position(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            esp_id = data.get('esp_id')
-            latitude = data.get('latitude')
-            longitude = data.get('longitude')
+            id_esp32 = data.get('id_esp32')
+            lat = data.get('latitude')
+            lon = data.get('longitude')
 
-            if not esp_id or latitude is None or longitude is None:
-                return JsonResponse({'error': 'esp_id, latitude et longitude requis'}, status=400)
+            if not id_esp32 or lat is None or lon is None:
+                return JsonResponse({'error': 'id_esp32, latitude et longitude requis'}, status=400)
 
-            # Vérifier que l'ESP32 est enregistré (optionnel)
-            if not Device.objects.filter(esp_id=esp_id).exists():
-                Device.objects.create(esp_id=esp_id)
-
-            # Chemin vers le fichier positions.json
-            json_path = os.path.join(settings.MEDIA_ROOT, 'positions.json')
-
-            # Lire le fichier existant ou créer un nouveau dictionnaire
+            # Chargement des positions
+            json_path = os.path.join('data', 'latlng.json')
             if os.path.exists(json_path):
                 with open(json_path, 'r') as f:
                     positions = json.load(f)
             else:
                 positions = {}
 
-            # Mettre à jour ou ajouter la position de l'appareil
-            positions[esp_id] = {
-                'latitude': latitude,
-                'longitude': longitude
+            ancienne = positions.get(id_esp32, {})
+            alert_deja_envoyee = ancienne.get('alert_sent', False)
+
+            # Vérifier si dépassement
+            enfant = Enfant.objects.filter(id_esp32=id_esp32).first()
+            if enfant:
+                distance_metres = distance((lat, lon), (LAT, LON)).m
+                en_dehors = distance_metres > RAYON_SECURITE
+
+                if en_dehors and not alert_deja_envoyee:
+                    envoyer_alerte_sms(enfant, lat, lon)
+                    alert_deja_envoyee = True
+
+                if not en_dehors:
+                    alert_deja_envoyee = False  # Reset l’alerte une fois revenu
+
+            # Sauvegarde des données
+            positions[id_esp32] = {
+                'latitude': round(lat, 8),
+                'longitude': round(lon, 8),
+                'timestamp': datetime.now().isoformat(),
+                'alert_sent': alert_deja_envoyee
             }
 
-            # Écrire dans le fichier
             with open(json_path, 'w') as f:
-                json.dump(positions, f, indent=4)
+                json.dump(positions, f, indent=2)
 
-            return JsonResponse({'message': 'Coordonnées enregistrées avec succès'})
-        
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Données JSON invalides'}, status=400)
+            return JsonResponse({'message': 'Position enregistrée'})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
+
+
+
+@login_required
+def get_position_enfant(request, enfant_id):
+    enfant = get_object_or_404(Enfant, id=enfant_id)
+
+    # Vérifie les droits d’accès
+    if request.user != enfant.responsable and \
+       request.user not in enfant.parents.all() and \
+       request.user not in enfant.parrains.all():
+        return JsonResponse({'error': 'Accès refusé'}, status=403)
+
+    json_path = os.path.join('data', 'latlng.json')
+
+    try:
+        with open(json_path, 'r') as f:
+            positions = json.load(f)
+
+        esp_id = enfant.id_esp32
+
+        if esp_id not in positions:
+            return JsonResponse({'error': 'Position non trouvée'}, status=404)
+
+        pos = positions[esp_id]
+        return JsonResponse({
+            'latitude': pos['latitude'],
+            'longitude': pos['longitude'],
+            'timestamp': pos.get('timestamp')
+        })
+
+    except FileNotFoundError:
+        return JsonResponse({'error': 'Fichier introuvable'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Fichier mal formé'}, status=500)
+
 
 
 @login_required
@@ -203,41 +285,7 @@ def suivre_enfant(request, enfant_id):
         return render(request, 'trackingtalibe/erreur.html', {
             'message': "Vous n’êtes pas autorisé à suivre cet enfant."
         })
-
-@login_required
-def get_position_enfant(request, enfant_id):
-    enfant = get_object_or_404(Enfant, id=enfant_id)
-
-    # Vérification de l’autorisation
-    if request.user != enfant.responsable and \
-       request.user not in enfant.parents.all() and \
-       request.user not in enfant.parrains.all():
-        return JsonResponse({'error': 'Accès refusé'}, status=403)
-
-    # Fichier JSON avec les positions GPS
-    json_path = os.path.join(settings.MEDIA_ROOT, 'positions.json')
-
-    try:
-        with open(json_path, 'r') as f:
-            positions = json.load(f)
-
-        esp_id = enfant.id_esp32  # Clé utilisée dans le JSON
-
-        if esp_id not in positions:
-            return JsonResponse({'error': 'Pas de position trouvée'}, status=404)
-
-        pos = positions[esp_id]
-        return JsonResponse({
-            'latitude': pos['latitude'],
-            'longitude': pos['longitude'],
-        })
-
-    except FileNotFoundError:
-        return JsonResponse({'error': 'Fichier de positions introuvable'}, status=404)
-
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Fichier JSON mal formé'}, status=500)
-
+    
 @login_required
 def modifier_enfant(request, pk):
     enfant = get_object_or_404(Enfant, pk=pk, responsable=request.user)
@@ -274,29 +322,6 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'trackingtalibe/password_reset_complete.html'
 
-
-def recevoir_contacts(request, esp_id):
-    auth_header = request.headers.get('Authorization')
-    if not auth_header or not auth_header.startswith('Token '):
-        return JsonResponse({'error': 'Token manquant ou invalide'}, status=401)
-
-    token_key = auth_header.split(' ')[1]
-    try:
-        token = DeviceToken.objects.get(key=token_key, esp__esp_id=esp_id)
-    except DeviceToken.DoesNotExist:
-        return JsonResponse({'error': 'Token invalide ou non associé à cet ESP32'}, status=403)
-
-    try:
-        enfant = Enfant.objects.get(id_esp32=esp_id)
-    except Enfant.DoesNotExist:
-        return JsonResponse({'error': 'Aucun enfant associé à cet ESP32'}, status=404)
-
-    contacts = {
-        'serigne': enfant.responsable.téléphone,
-        'parents': list(enfant.parents.values_list('téléphone', flat=True)),
-        'parrains': list(enfant.parrains.values_list('téléphone', flat=True)),
-    }
-    return JsonResponse(contacts)
 
 
 @csrf_exempt
@@ -385,4 +410,17 @@ def dissocier_utilisateur(request, enfant_id, utilisateur_id):
 
     messages.success(request, "L'utilisateur a été dissocié avec succès.")
     return redirect('gestion_associations')
+
+@login_required
+def changer_mot_de_passe(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Garde l'utilisateur connecté
+            messages.success(request, "Votre mot de passe a été modifié avec succès.")
+            return redirect('accueil')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'trackingtalibe/changer_mot_de_passe.html', {'form': form})
 

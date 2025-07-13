@@ -2,8 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center" style="margin-bottom: 3%;">
-    <div class="card bg-dark text-white" style="width: 20rem;">
+    <div class="card bg-dark text-white mt-2" style="width: 100%; max-width: 350px; margin-left: 20px;">
         <div class="card-header text-white text-center" style="background-color: rgb(35, 163, 223);">
             <h3>Se connecter</h3>
         </div>
@@ -12,13 +11,12 @@
                 {% csrf_token %}
                 {{ form|crispy }}
                 <div class="d-grid">
-                     <a href="{% url 'password_reset' %}" style="font-size: smaller;">Mot de passe oublié?</a><br>
+                    <a href="{% url 'password_reset' %}" style="font-size: smaller;">Mot de passe oublié?</a><br>
                     <button type="submit" class="btn btn-success container">Connexion</button><br>
-                    <p class="text-center">ou </p>
-                    <a href="{% url 'register' %}" class=" text-center">S'inscrire</a>
+                    <p class="text-center">ou</p>
+                    <a href="{% url 'register' %}" class="text-center">S'inscrire</a>
                 </div>
             </form>
         </div>
     </div>
-</div>
 {% endblock %}

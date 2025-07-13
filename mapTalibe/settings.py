@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-k_l44zh$5v1v$75m(q3v4i#5bpd5%-a^yy8et^$cw4@c4^f^v2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -139,13 +139,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'maptalibe@gmail.com'
+EMAIL_HOST_PASSWORD = 'tr@ck2025@'
+EMAIL_USE_TLS = True
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@maptalibe.com'
+TWILIO_SID = 'AC4b0cbbb4fb28704227b3abc0097cf7e7'
+TWILIO_TOKEN = 'f1303578b9d57ce672e8ad15c6c33354'
+TWILIO_NUMERO = '+14174288715'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'maptalibe@gmail.com'
-# EMAIL_HOST_PASSWORD = 'tr@ck2025@'
-# EMAIL_USE_TLS = True
+DAARA_LAT = 14.692425
+DAARA_LON = -16.466784
+RAYON_SECURITE_METRES = 30
