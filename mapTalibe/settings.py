@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()  # Charge les variables du fichier .env
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -139,17 +141,20 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'maptalibe@gmail.com'
-EMAIL_HOST_PASSWORD = 'tr@ck2025@'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
-TWILIO_SID = 'AC4b0cbbb4fb28704227b3abc0097cf7e7'
-TWILIO_TOKEN = 'f1303578b9d57ce672e8ad15c6c33354'
-TWILIO_NUMERO = '+14174288715'
+TWILIO_SID = os.environ.get('TWILIO_SID')
+TWILIO_TOKEN = os.environ.get('TWILIO_TOKEN')
+TWILIO_NUMERO = os.environ.get('TWILIO_NUMERO')
 
 DAARA_LAT = 14.692425
 DAARA_LON = -16.466784
 RAYON_SECURITE_METRES = 30
+
+MAPBOX_TOKEN = os.environ.get('MAPBOX_TOKEN')
