@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k_l44zh$5v1v$75m(q3v4i#5bpd5%-a^yy8et^$cw4@c4^f^v2'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
 
 
 # Application definition
@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'mapTalibe.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'maptalibe',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -153,8 +157,8 @@ TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_TOKEN = os.environ.get('TWILIO_TOKEN')
 TWILIO_NUMERO = os.environ.get('TWILIO_NUMERO')
 
-DAARA_LAT = 14.692425
-DAARA_LON = -16.466784
-RAYON_SECURITE_METRES = 30
+DAARA_LAT = 14.69726181
+DAARA_LON = -16.47735023
+RAYON_SECURITE_METRES = 20
 
 MAPBOX_TOKEN = os.environ.get('MAPBOX_TOKEN')
