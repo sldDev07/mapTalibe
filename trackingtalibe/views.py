@@ -11,27 +11,28 @@ from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, 
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import json, os
+import json, os, traceback
 from datetime import datetime
 from twilio.rest import Client
 from math import radians, cos, sin, asin, sqrt
 from geopy.distance import distance  
 from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
+
 
 def accueil(request):
     return render(request, 'trackingtalibe/accueil.html')
 
 def register(request):
-    role_selected = request.POST.get('role_selection', None)
+    role_selected = request.GET.get('role_selection', 'parent')
 
     if request.method == 'POST':
         form = InscriptionForm(request.POST, role_selected=role_selected)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = role_selected
+            user.role = request.POST.get('role', role_selected)
             user.save()
-            login(request, user)
-            return redirect('redirection_espace')
+            return redirect('login')  # Correction ici
     else:
         form = InscriptionForm(role_selected=role_selected)
 
@@ -39,6 +40,7 @@ def register(request):
         'form': form,
         'role_selected': role_selected,
     })
+
 
 
 def login_view(request):
@@ -73,7 +75,7 @@ def espace_serigne(request):
         return HttpResponse("<h3>Accès non autorisé </h3>")
 
     enfants = Enfant.objects.filter(responsable=request.user)
-    return render(request, 'trackingtalibe/espace_serigne.html', {'enfants': enfants})
+    return render(request, 'trackingtalibe/espace_serigne.html', {'enfants': enfants,'active_page': 'dashboard'})
 
 @login_required
 def espace_ndeye(request):
@@ -83,7 +85,7 @@ def espace_ndeye(request):
     enfants = request.user.enfants_parrains.all()
     demandes_en_attente = DemandeAssociation.objects.filter(utilisateur=request.user)
     
-    return render(request, 'trackingtalibe/espace_ndeye.html', {'enfants': enfants})
+    return render(request, 'trackingtalibe/espace_ndeye.html', {'enfants': enfants, 'active_page': 'dashboard'})
 
 @login_required
 def espace_parent(request):
@@ -93,7 +95,7 @@ def espace_parent(request):
     enfants = request.user.enfants_parents.all()
     demandes_en_attente = DemandeAssociation.objects.filter(utilisateur=request.user)
     
-    return render(request, 'trackingtalibe/espace_parent.html', {'enfants': enfants})
+    return render(request, 'trackingtalibe/espace_parent.html', {'enfants': enfants, 'active_page': 'dashboard'})
 @login_required
 def ajouter_enfant(request):
     if request.user.role != 'serigne':
@@ -104,8 +106,10 @@ def ajouter_enfant(request):
         if form.is_valid():
             enfant = form.save(commit=False)
             enfant.responsable = request.user
+            # Associe automatiquement le Daara du Serigne
+            enfant.daara = request.user.daaras.first()
             enfant.save()
-            return redirect('espace_serigne')
+            return redirect('ajouter_enfant')
     else:
         form = EnfantForm()
 
@@ -129,7 +133,7 @@ def associer_par_code(request):
                     role=request.user.role
                 )
                 messages.success(request, "Votre demande a été envoyée au Serigne Daara.")
-                return redirect('redirection_espace')
+                return redirect('associer_par_code')
             except Enfant.DoesNotExist:
                 messages.error(request, "Aucun enfant avec cet ID ESP32 n’a été trouvé.")
     else:
@@ -148,17 +152,16 @@ Twilio_TOKEN = settings.TWILIO_TOKEN
 Twilio_NUMERO = settings.TWILIO_NUMERO
 
 # Position du Daara
-LAT = settings.DAARA_LAT
-LON = settings.DAARA_LON
-RAYON_SECURITE = settings.RAYON_SECURITE_METRES
+# LAT = settings.DAARA_LAT
+# LON = settings.DAARA_LON
+# RAYON = settings.RAYON_SECURITE
 
 
 def envoyer_alerte_sms(enfant, lat, lon):
     url_suivi = f"https://maptalibe.com/enfant/{enfant.id}/suivre/"
     
     msg = (
-        f"Alerte : {enfant.nom} {enfant.prenom} a quitté le périmètre du Daara. "
-        f"Suivez sa position ici : {url_suivi}"
+        f"Alerte : {enfant.nom} {enfant.prenom} a quitté le périmètre du Daara. Veuillez vous connecter pour le suivre immédiatement.\n"
     )
 
     client = Client(Twilio_SID, Twilio_TOKEN)
@@ -177,6 +180,35 @@ def envoyer_alerte_sms(enfant, lat, lon):
                 to=numero
             )
 
+def envoyer_alerte_email(enfant, lat, lon):
+    url_suivi = f"https://maptalibe.com/enfant/{enfant.id}/suivre/"
+    
+    sujet = f"Alerte – {enfant.nom} {enfant.prenom} a quitté le Daara"
+    message = (
+        f"Bonjour,\n\n"
+        f"⚠️ Alerte : {enfant.nom} {enfant.prenom} a quitté le périmètre de sécurité du Daara.\n"
+        f"Suivez sa position en temps réel ici : {url_suivi}\n\n"
+        f"Coordonnées :\nLatitude : {lat}\nLongitude : {lon}\n\n"
+        f"– MapTalibé"
+    )
+
+    destinataires = set()
+    if enfant.responsable and enfant.responsable.email:
+        destinataires.add(enfant.responsable.email)
+    destinataires.update(enfant.parents.values_list('email', flat=True))
+    destinataires.update(enfant.parrains.values_list('email', flat=True))
+
+    for email in destinataires:
+        if email:
+            send_mail(
+                sujet,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+
+
 @csrf_exempt
 def enregistrer_position(request):
     if request.method == 'POST':
@@ -189,31 +221,39 @@ def enregistrer_position(request):
             if not id_esp32 or lat is None or lon is None:
                 return JsonResponse({'error': 'id_esp32, latitude et longitude requis'}, status=400)
 
-            # Chargement des positions
             json_path = os.path.join('data', 'latlng.json')
+            os.makedirs('data', exist_ok=True)
+
             if os.path.exists(json_path):
                 with open(json_path, 'r') as f:
-                    positions = json.load(f)
+                    try:
+                        content = f.read().strip()
+                        positions = json.loads(content) if content else {}
+                    except json.JSONDecodeError:
+                        positions = {}
             else:
                 positions = {}
 
             ancienne = positions.get(id_esp32, {})
             alert_deja_envoyee = ancienne.get('alert_sent', False)
 
-            # Vérifier si dépassement
             enfant = Enfant.objects.filter(id_esp32=id_esp32).first()
             if enfant:
+                lat = enfant.daara.latitude
+                lon = enfant.daara.longitude
+                rayon = enfant.daara.rayon_securite_metres
+
                 distance_metres = distance((lat, lon), (LAT, LON)).m
                 en_dehors = distance_metres > RAYON_SECURITE
 
                 if en_dehors and not alert_deja_envoyee:
+                    envoyer_alerte_email(enfant, lat, lon)
                     envoyer_alerte_sms(enfant, lat, lon)
                     alert_deja_envoyee = True
 
                 if not en_dehors:
-                    alert_deja_envoyee = False  # Reset l’alerte une fois revenu
+                    alert_deja_envoyee = False
 
-            # Sauvegarde des données
             positions[id_esp32] = {
                 'latitude': round(lat, 8),
                 'longitude': round(lon, 8),
@@ -227,6 +267,8 @@ def enregistrer_position(request):
             return JsonResponse({'message': 'Position enregistrée'})
 
         except Exception as e:
+            print("Erreur:", e)
+            print(traceback.format_exc())
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
@@ -271,20 +313,31 @@ def get_position_enfant(request, enfant_id):
 @login_required
 def suivre_enfant(request, enfant_id):
     enfant = get_object_or_404(Enfant, id=enfant_id)
+    id_esp32 = enfant.id_esp32
 
-    if (
-        enfant.responsable == request.user
-        or request.user in enfant.parents.all()
-        or request.user in enfant.parrains.all()
-    ):
-        # La carte s'affichera quoi qu’il arrive, les coordonnées seront mises à jour via JS
-        return render(request, 'trackingtalibe/suivre_enfant.html', {
-            'enfant': enfant,
-        })
-    else:
-        return render(request, 'trackingtalibe/erreur.html', {
-            'message': "Vous n’êtes pas autorisé à suivre cet enfant."
-        })
+    file_path = os.path.join(settings.BASE_DIR, 'data', 'latlng.json')
+    latitude = None
+    longitude = None
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            positions = json.load(f)
+        if id_esp32 in positions:
+            latitude = float(positions[id_esp32]['latitude'])
+            longitude = float(positions[id_esp32]['longitude'])
+
+    # Correction : passe les coordonnées du Daara comme chaîne formatée
+    daara_latitude = str(enfant.daara.latitude) if enfant.daara and enfant.daara.latitude is not None else ""
+    daara_longitude = str(enfant.daara.longitude) if enfant.daara and enfant.daara.longitude is not None else ""
+
+    context = {
+        'enfant': enfant,
+        'MAPBOX_TOKEN': settings.MAPBOX_TOKEN,
+        'latitude': latitude,
+        'longitude': longitude,
+        'daara_latitude': daara_latitude,
+        'daara_longitude': daara_longitude,
+    }
+    return render(request, 'trackingtalibe/suivre_enfant.html', context)
     
 @login_required
 def modifier_enfant(request, pk):
@@ -419,8 +472,9 @@ def changer_mot_de_passe(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Garde l'utilisateur connecté
             messages.success(request, "Votre mot de passe a été modifié avec succès.")
-            return redirect('accueil')
+            return redirect('redirection_espace')
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'trackingtalibe/changer_mot_de_passe.html', {'form': form})
+
 

@@ -4,137 +4,156 @@
 {% block content %}
 <h4 class="text-center" style="margin-top: 60px;">Suivi de {{ enfant.nom }} {{ enfant.prenom }}</h4>
 
-<div id="map" style="height: 500px; border: 2px solid #ccc; margin-bottom: 4rem; width: 100%;"></div>
+<div id="alerte-securite" class="alert alert-danger text-center fw-bold" style="display: none;">
+    ⚠️ Alerte : {{ enfant.nom }} {{ enfant.prenom }} est en dehors du périmètre de sécurité !
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div id="map" class="container" style="height: 500px; border: 2px solid #050505; margin-bottom: 4rem; width: 80%;"></div>
 
 <script>
     var enfantId = {{ enfant.id }};
-    var map = L.map('map').setView([14.69234, -16.46627], 18);
 
-    // 🗺️ Tuile satellite Mapbox
-    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        id: 'mapbox/satellite-streets-v12',
-        tileSize: 512,
-        zoomOffset: -1,
-        maxZoom: 22,
-        accessToken: 'pk.eyJ1Ijoic2xkMDciLCJhIjoiY21iNzd6czAxMDdxYjJqczFiOWgxajI0biJ9.cT9ueN4meMGQFRMZ6Q5GJg',
-        attribution: '© <a href="https://www.mapbox.com/">Mapbox</a>'
-    }).addTo(map);
+    var enfantLat = parseFloat("{{ latitude }}");
+    var enfantLon = parseFloat("{{ longitude }}");
+    var daaraLat = parseFloat("{{ daara_latitude }}");
+    var daaraLon = parseFloat("{{ daara_longitude }}");
 
-    // 📍 Icône enfant
-    var enfantIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -32]
-    });
+    console.log("enfantLat:", enfantLat, "enfantLon:", enfantLon);
+    console.log("daaraLat:", daaraLat, "daaraLon:", daaraLon);
 
-    var marker = L.marker([14.69234, -16.46627], { icon: enfantIcon }).addTo(map);
-    marker.bindPopup("{{ enfant.nom }} {{ enfant.prenom }}").openPopup();
+    if (!isNaN(enfantLat) && !isNaN(enfantLon) && !isNaN(daaraLat) && !isNaN(daaraLon)) {
+        var map = L.map('map').setView([enfantLat, enfantLon], 18);
 
-    var currentLatLng = marker.getLatLng();
-    var targetLatLng = currentLatLng;
-    var animating = false;
-    var userCircle = null;
-    var traceLine = null;
+        // 🗺️ Tuile satellite Mapbox
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+            id: 'mapbox/satellite-streets-v12',
+            tileSize: 512,
+            zoomOffset: -1,
+            maxZoom: 22,
+            accessToken: '{{ MAPBOX_TOKEN }}',
+            attribution: '© <a href="https://www.mapbox.com/">Mapbox</a>'
+        }).addTo(map);
 
-    // 🏠 Icône Daara
-    var daaraIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/69/69524.png',
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-        popupAnchor: [0, -36]
-    });
+        // 📍 Icône enfant
+        var enfantIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
 
-    var daaraCoords = [14.692425, -16.466784];  // ⚠️ Personnaliser
-    var daaraMarker = L.marker(daaraCoords, { icon: daaraIcon }).addTo(map);
-    daaraMarker.bindPopup("Daara {{ user.nom_daara }}");
+        var marker = L.marker([enfantLat, enfantLon], { icon: enfantIcon }).addTo(map);
+        marker.bindPopup("{{ enfant.nom }} {{ enfant.prenom }}").openPopup();
 
-    var cercleSecurite = L.circle(daaraCoords, {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.2,
-        radius: 1200  // mètres
-    }).addTo(map);
+        var currentLatLng = marker.getLatLng();
+        var targetLatLng = currentLatLng;
+        var animating = false;
+        var userCircle = null;
+        var traceLine = null;
 
-    // Fonction d’interpolation
-    function interpolatePosition(start, end, factor) {
-        return [
-            start.lat + (end.lat - start.lat) * factor,
-            start.lng + (end.lng - start.lng) * factor
-        ];
-    }
+        // 🏠 Icône Daara
+        var daaraIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/69/69524.png',
+            iconSize: [36, 36],
+            iconAnchor: [18, 36],
+            popupAnchor: [0, -36]
+        });
 
-    function animateMarker() {
-        if (!animating) return;
-        currentLatLng = marker.getLatLng();
-        let interpolated = interpolatePosition(currentLatLng, targetLatLng, 0.2);
-        marker.setLatLng(interpolated);
-        marker.update();
-        map.panTo(interpolated, { animate: true, duration: 0.5 });
+        // Correction ici : utilise bien les variables daaraLat et daaraLon
+        var daaraCoords = [daaraLat, daaraLon];
+        console.log("daaraCoords:", daaraCoords); // Vérification
+        var daaraMarker = L.marker(daaraCoords, { icon: daaraIcon }).addTo(map);
+        daaraMarker.bindPopup("Daara {{ enfant.daara.nom }}");
 
-        if (Math.abs(interpolated[0] - targetLatLng.lat) > 0.00001 || Math.abs(interpolated[1] - targetLatLng.lng) > 0.00001) {
-            requestAnimationFrame(animateMarker);
+        var cercleSecurite = L.circle(daaraCoords, {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.2,
+            radius: {{ enfant.daara.rayon_securite_metres }}
+        }).addTo(map);
+
+        // Fonction d’interpolation
+        function interpolatePosition(start, end, factor) {
+            return [
+                start.lat + (end.lat - start.lat) * factor,
+                start.lng + (end.lng - start.lng) * factor
+            ];
         }
-    }
 
-    // 🚶 Calcul d’itinéraire via Mapbox Directions API
-    function getRoute(userLatLng, enfantLatLng) {
-        var accessToken = 'pk.eyJ1Ijoic2xkMDciLCJhIjoiY21iNzd6czAxMDdxYjJqczFiOWgxajI0biJ9.cT9ueN4meMGQFRMZ6Q5GJg';
-        var url = `https://api.mapbox.com/directions/v5/mapbox/driving/${userLatLng.lng},${userLatLng.lat};${enfantLatLng.lng},${enfantLatLng.lat}?geometries=geojson&access_token=${accessToken}`;
+        function animateMarker() {
+            if (!animating) return;
+            currentLatLng = marker.getLatLng();
+            let interpolated = interpolatePosition(currentLatLng, targetLatLng, 0.2);
+            marker.setLatLng(interpolated);
+            marker.update();
+            map.panTo(interpolated, { animate: true, duration: 0.5 });
 
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                if (data.routes && data.routes.length > 0) {
-                    var coords = data.routes[0].geometry.coordinates;
-                    var latlngs = coords.map(c => [c[1], c[0]]);  // lng, lat → lat, lng
-
-                    if (traceLine) {
-                        traceLine.setLatLngs(latlngs);
-                    } else {
-                        traceLine = L.polyline(latlngs, { color: 'blue', weight: 4 }).addTo(map);
-                    }
-                }
-            })
-            .catch(err => {
-                console.error("Erreur itinéraire :", err);
-            });
-    }
-
-    // Position utilisateur (point bleu)
-    function updateUserLocation() {
-        if (!navigator.geolocation) return;
-
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                var userLatLng = L.latLng(lat, lng);
-
-                if (!userCircle) {
-                    userCircle = L.circleMarker(userLatLng, {
-                        radius: 8,
-                        color: '#0d6efd',
-                        fillColor: '#0d6efd',
-                        fillOpacity: 1
-                    }).addTo(map).bindPopup("Votre position");
-                } else {
-                    userCircle.setLatLng(userLatLng);
-                }
-
-                // Mettre à jour la trace
-                if (marker && marker.getLatLng()) {
-                    getRoute(userLatLng, marker.getLatLng());
-                }
-            },
-            function(error) {
-                console.error("Erreur géolocalisation :", error);
+            if (Math.abs(interpolated[0] - targetLatLng.lat) > 0.00001 || Math.abs(interpolated[1] - targetLatLng.lng) > 0.00001) {
+                requestAnimationFrame(animateMarker);
             }
-        );
-    }
+        }
 
-    // 🛰️ Mise à jour des coordonnées de l’enfant
-    function updatePosition() {
+        // 🚶 Calcul d’itinéraire via Mapbox Directions API
+        function getRoute(userLatLng, enfantLatLng) {
+            var accessToken = '{{ MAPBOX_TOKEN }}';
+            var url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLatLng.lng},${userLatLng.lat};${enfantLatLng.lng},${enfantLatLng.lat}?geometries=geojson&access_token=${accessToken}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.routes && data.routes.length > 0) {
+                        var coords = data.routes[0].geometry.coordinates;
+                        var latlngs = coords.map(c => [c[1], c[0]]);
+
+                        if (traceLine) {
+                            traceLine.setLatLngs(latlngs);
+                        } else {
+                            traceLine = L.polyline(latlngs, { color: 'blue', weight: 4 }).addTo(map);
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error("Erreur itinéraire :", err);
+                });
+        }
+
+        // Position utilisateur (point bleu)
+        function updateUserLocation() {
+            if (!navigator.geolocation) return;
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var userLatLng = L.latLng(lat, lng);
+
+                    if (!userCircle) {
+                        userCircle = L.circleMarker(userLatLng, {
+                            radius: 8,
+                            color: '#0d6efd',
+                            fillColor: '#0d6efd',
+                            fillOpacity: 1
+                        }).addTo(map).bindPopup("Votre position");
+                    } else {
+                        userCircle.setLatLng(userLatLng);
+                    }
+
+                    // Mettre à jour la trace
+                    if (marker && marker.getLatLng()) {
+                        getRoute(userLatLng, marker.getLatLng());
+                    }
+                },
+                function(error) {
+                    console.error("Erreur géolocalisation :", error);
+                }
+            );
+        }
+
+        // 🛰️ Mise à jour des coordonnées de l’enfant
+        function updatePosition() {
         fetch(`/enfant/${enfantId}/position/?t=${Date.now()}`)
             .then(response => response.json())
             .then(data => {
@@ -142,6 +161,26 @@
                     targetLatLng = L.latLng(data.latitude, data.longitude);
                     animating = true;
                     animateMarker();
+
+                    // Distance entre enfant et Daara
+                    var distance = map.distance(targetLatLng, daaraCoords); // en mètres
+                    var dansZone = distance <= cercleSecurite.getRadius();
+
+                    // 🔄 Mise à jour du cercle
+                    if (dansZone) {
+                        cercleSecurite.setStyle({
+                            color: 'green',
+                            fillColor: '#5df58a'
+                        });
+                        document.getElementById('alerte-securite').style.display = 'none';
+                    } else {
+                        cercleSecurite.setStyle({
+                            color: 'red',
+                            fillColor: '#f03'
+                        });
+                        document.getElementById('alerte-securite').style.display = 'block';
+                    }
+
                 }
             })
             .catch(error => {
@@ -151,7 +190,11 @@
         updateUserLocation();
     }
 
-    updatePosition();
-    setInterval(updatePosition, 2000); // toutes les 2 secondes
+
+        updatePosition();
+        setInterval(updatePosition, 500);
+    } else {
+        document.getElementById('map').innerHTML = "<div class='alert alert-warning'>Position Indisponible pour le moment.</div>";
+    }
 </script>
 {% endblock %}

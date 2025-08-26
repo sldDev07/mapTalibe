@@ -1,39 +1,126 @@
 {% extends 'trackingtalibe/base.html' %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-<div class="justify-content-center" style="margin-bottom: 3%; margin-left: 20px; margin-top: 60px;">
-    <div class="card bg-dark text-white" style="width: 100%; min-width: 400px; font-size: small;">
-        <div class="card-header text-white text-center" style="background-color: rgb(35, 163, 223);">
-            <h3>Inscription</h3>
-        </div>
-        <div class="card-body" style="font-size: smaller;" >
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="role_selection" class="form-label">Type de compte :</label>
-                    <select name="role_selection" id="role_selection" class="form-select" onchange="this.form.submit()">
-                        <option value="parent" {% if role_selected == 'parent' %}selected{% endif %}>Parent</option>
-                        <option value="serigne" {% if role_selected == 'serigne' %}selected{% endif %}>Serigne Daara</option>
-                        <option value="ndeye" {% if role_selected == 'ndeye' %}selected{% endif %}>Ndèye Daara</option>
-                    </select>
-                </div>
-                <div class="row">
-                    {% for field in form.visible_fields %}
-                        {% if forloop.counter0|divisibleby:2 and not forloop.first %}
-                            </div><div class="row">
-                        {% endif %}
-                        <div class="col-md-6 mb-3">
-                            {{ field|as_crispy_field }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success">S'inscrire</button><br>
-                    <p class="text-center">ou</p>
-                    <a href="{% url 'login' %}" class="text-center">Se connecter</a>
-                </div>
-            </form>
-        </div>
-    </div>
+<style>
+  .register-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    gap: 2rem;
+    padding: 2rem;
+    background-color: #f0f2f5b9;
+  }
+
+  .register-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    flex: 1 1 550px;
+    max-width: 540px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .welcome-box {
+    background: linear-gradient(135deg, #0126b0, #1871f2);
+    color: white;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    flex: 1 1 300px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .welcome-box h2 {
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .welcome-box p {
+    margin-bottom: 2rem;
+  }
+
+  .btn-white-outline {
+    background-color: white;
+    color: #0126b0;
+    border: none;
+    font-weight: bold;
+  }
+
+  @media (max-width: 768px) {
+    .register-wrapper {
+      flex-direction: column;
+    }
+
+    .register-box, .welcome-box {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="register-wrapper">
+  <div class="register-box">
+    <h3 class="text-center mb-4">Inscription</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="role_selection" class="form-label">Type de compte :</label>
+            <select id="role_selection" class="form-select">
+                <option value="parent" {% if role_selected == 'parent' %}selected{% endif %}>Parent</option>
+                <option value="serigne" {% if role_selected == 'serigne' %}selected{% endif %}>Serigne Daara</option>
+                <option value="ndeye" {% if role_selected == 'ndeye' %}selected{% endif %}>Ndèye Daara</option>
+            </select>
+            <input type="hidden" name="role" id="role_hidden" value="{{ role_selected }}">
+            <script>
+                const selectRole = document.getElementById('role_selection');
+                const hiddenRole = document.getElementById('role_hidden');
+                selectRole.addEventListener('change', function() {
+                    const role = this.value;
+                    hiddenRole.value = role;
+                    window.location.href = `{% url 'register' %}?role_selection=` + role;
+                });
+            </script>
+
+      </div>
+
+      <div class="row">
+        {% for field in form.visible_fields %}
+          {% if forloop.counter0|divisibleby:2 and not forloop.first %}
+            </div><div class="row">
+          {% endif %}
+          <div class="col-md-6 mb-3">
+            {{ field|as_crispy_field }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        <p class="text-center mt-2">ou</p>
+        <a href="{% url 'login' %}" class="text-center">Se connecter</a>
+      </div>
+      <script>
+        // Synchronise le champ caché avec le select avant la soumission
+        document.querySelector('form').addEventListener('submit', function() {
+          document.getElementById('role_hidden').value = document.getElementById('role_selection').value;
+        });
+      </script>
+    </form>
+  </div>
+  <div class="welcome-box">
+    <h2>            
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+        </svg>
+            MapTalibé
+    </h2>
+    <p>Merci de rejoindre la communauté MapTalibé</p>
+    <a href="{% url 'accueil' %}" class="btn btn-white-outline px-4 py-2">Accueil</a>
+  </div>
 </div>
 {% endblock %}

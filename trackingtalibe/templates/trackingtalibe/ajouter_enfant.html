@@ -2,29 +2,46 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container d-flex justify-content-center" style="margin-bottom: 3%; margin-top: 100px;">
-    <div class="card bg-dark text-white" style="width: 40rem;">
-        <div class="card-header text-center" style="background-color: rgb(35, 163, 223); color: black;">
-            <h3>Ajouter un talibé</h3>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="row w-100 d-flex justify-content-center">
+    
+    <!-- 📄 Formulaire -->
+    <div class="col-md-6 p-4" style="background: #fff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+      <h3 class="text-center mb-4" style="font-weight: bold; color: #2b2b2b;">Ajouter un talibé</h3>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          {% for field in form.visible_fields %}
+            {% if forloop.counter0|divisibleby:2 and not forloop.first %}
+              </div><div class="row">
+            {% endif %}
+            <div class="col-md-6 mb-3">
+              {{ field|as_crispy_field }}
+            </div>
+          {% endfor %}
         </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                <div class="row">
-                    {% for field in form.visible_fields %}
-                        {% if forloop.counter0|divisibleby:2 and not forloop.first %}
-                            </div><div class="row">
-                        {% endif %}
-                        <div class="col-md-6 mb-3">
-                            {{ field|as_crispy_field }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="d-grid container" style="width: 10rem;">
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                </div>
-            </form>
+        <div class="d-grid mt-3">
+          <button type="submit" class="btn btn-primary">
+            Enregistrer
+          </button>
         </div>
+      </form>
     </div>
+
+    <!-- 💙 Zone à droite -->
+    <div class="col-md-5 mt-4 mt-md-0 d-flex align-items-center justify-content-center">
+      <div style="background: linear-gradient(to bottom right, #0046ad, #007bff); border-radius: 15px; padding: 3rem; color: white; width: 100%; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.1);">
+        <h3 class="fw-bold mb-3">            
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+            </svg>
+            MapTalibé
+        </h3>
+        <p>Ajoutez les enfants à votre Daara et commencez le suivi.</p>
+        <a href="{% url 'espace_serigne' %}" class="btn btn-light mt-2">Retour au tableau de bord</a>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}

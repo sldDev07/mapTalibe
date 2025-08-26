@@ -2,21 +2,120 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="card bg-dark text-white mt-2" style="width: 100%; max-width: 350px; margin-left: 20px;">
-        <div class="card-header text-white text-center" style="background-color: rgb(35, 163, 223);">
-            <h3>Se connecter</h3>
-        </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <div class="d-grid">
-                    <a href="{% url 'password_reset' %}" style="font-size: smaller;">Mot de passe oublié?</a><br>
-                    <button type="submit" class="btn btn-success container">Connexion</button><br>
-                    <p class="text-center">ou</p>
-                    <a href="{% url 'register' %}" class="text-center">S'inscrire</a>
+<style>
+.login-wrapper {
+    display: flex;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f2f5a9;
+    padding: 2rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.login-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 350px;
+}
+
+.login-box h3 {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.login-box .btn-login {
+    background-color: #0015c3;
+    color: white;
+    font-weight: bold;
+    border: none;
+}
+
+.login-box .btn-login:hover {
+    background-color: #000e9c;
+}
+
+.login-box a {
+    font-size: 0.9rem;
+    color: #333;
+    text-decoration: underline;
+}
+
+.login-box a:hover {
+    color: #0015c3;
+}
+
+.welcome-box {
+    background: linear-gradient(135deg, #0126b0, #1871f2);
+    color: white;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-box h2 {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.welcome-box p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.welcome-box .btn-signup {
+    background-color: white;
+    color: #0126b0;
+    font-weight: bold;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.welcome-box .btn-signup:hover {
+    background-color: #d9e6ff;
+    color: #00128c;
+}
+</style>
+
+<div class="login-wrapper">
+    <!-- Partie connexion -->
+    <div class="login-box">
+        <h3>Connexion</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="mb-2 d-flex justify-content-between">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="remember">
+                    <label class="form-check-label" for="remember" style="font-size: small;">Se souvenir de moi</label>
                 </div>
-            </form>
-        </div>
+                <a href="{% url 'password_reset' %}" style="font-size: small; color: #1871f2;">Mot de passe oublie </a>
+            </div>
+            <button type="submit" class="btn btn-login w-100 mt-2">
+                <i class="bi bi-box-arrow-in-right"></i> Se connecter
+            </button>
+        </form>
     </div>
+
+    <!-- Partie inscription -->
+    <div class="welcome-box">
+        <h2>            
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+                <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+            </svg>
+            MapTalibé
+        </h2>
+        <p>Vous n'avez pas encore de compte ?</p>
+        <a href="{% url 'register' %}" class="btn btn-signup">S'inscrire</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,32 +1,31 @@
 {% extends 'trackingtalibe/base.html' %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-<div class="container d-flex justify-content-center" style="margin-bottom: 5%; margin-top: 100px;">
-    <div class="card text-white bg-dark shadow" style="width: 22rem;">
-        <div class="card-header text-center" style="background-color: #1267e6;">
-            <h3>Changer mot de passe</h3>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="col-md-6 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h3 class="text-center mb-4" style="font-weight: bold; color: #2b2b2b;">Changer le mot de passe</h3>
+    
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          {{ field|as_crispy_field }}
+          <style>
+            #{{ field.auto_id }}_helptext { display: none; }
+          </style>
+          {% if field.errors %}
+            <div class="text-danger">{{ field.errors }}</div>
+          {% endif %}
         </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3">
-                        {{ field|as_crispy_field }}
-                        <style>
-                            #{{ field.auto_id }}_helptext { display: none; }
-                        </style>
-                        {% if field.errors %}
-                            <div class="text-danger">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <div class="d-grid mt-3">
-                    <button type="submit" class="btn btn-success">
-                        Enregistrer les modifications
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+      {% endfor %}
+
+      <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-primary">
+          Enregistrer les modifications
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}

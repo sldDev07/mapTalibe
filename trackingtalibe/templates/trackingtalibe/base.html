@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}MapTalibé{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       crossorigin=""/>
@@ -44,10 +45,11 @@
     transition: width 0.3s ease;
   }
   .navbar-top-fixed {
-  top: 0;
-  z-index: 1050;
-  height: 60px;
-}
+    top: 0;
+    z-index: 900; /* inférieur au z-index de la sidebar (1000) */
+    width: 100%;
+  }
+
 
 /* Mobile : sidebar = 56px */
 @media (max-width: 768px) {
@@ -103,7 +105,20 @@
 #main-content-public {
   margin-left: 0 !important;
 }
+/* Décaler la navbar déconnexion pour qu’elle suive le contenu principal */
+@media (min-width: 768px) {
+  .navbar-top-fixed.authenticated {
+    margin-left: 16.6667%; /* identique à la largeur de la sidebar */
+    width: calc(100% - 16.6667%);
+  }
+}
 
+@media (max-width: 768px) {
+  .navbar-top-fixed.authenticated {
+    margin-left: 56px; /* identique à la sidebar sur mobile */
+    width: calc(100% - 56px);
+  }
+}
 </style>
 
 </head>
@@ -111,60 +126,64 @@
     {% if user.is_authenticated %}
 <div class="container-fluid">
   <div class="row">
-    <nav class="col-2 col-md-2 bg-dark sidebar px-2" style="min-height: 100vh; position: fixed;">
-      <div class="position-sticky pt-4 text-center">
-        <a href="{% url 'redirection_espace' %}" class="d-flex flex-column align-items-center text-decoration-none text-white mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
-            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+    <nav class="navbar-nav col-2 col-md-2 sidebar px-2" style="min-height: 100vh; position: fixed; background-color: rgb(255, 255, 255); border: 2px solid #cecbcb;"">
+  <div class="position-sticky pt-4 text-center">
+    <a href="{% url 'redirection_espace' %}" class="d-flex flex-column align-items-center text-decoration-none text-dark mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
+      </svg>
+      <span class="d-none d-md-inline mt-1" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: #3542f5; font-size:x-large;">MapTalibé</span>
+    </a>
+    <ul class="nav flex-column text-dark" style="font-size: small;">
+
+      <!-- Tableau de bord -->
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if active_page == 'dashboard' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'redirection_espace' %}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-columns-gap" viewBox="0 0 16 16">
+            <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
           </svg>
-          <span class="d-none d-md-inline mt-1" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: rgb(138, 214, 245);">MapTalibé</span>
+          <span class="d-none d-md-inline mt-1">Tableau de bord</span>
         </a>
-        <ul class="nav flex-column text-white" style="font-size: small;">
-          <li class="nav-item mb-3">
-            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'redirection_espace' %}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-columns-gap" viewBox="0 0 16 16">
-                <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
-              </svg>
-              <span class="d-none d-md-inline mt-1">Tableau de bord</span>
-            </a>
-          </li>
+      </li>
 
-          <li class="nav-item mb-3">
-            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'accueil' %}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
-                  <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
-                </svg>
-              <span class="d-none d-md-inline mt-1">Accueil</span>
-            </a>
-          </li>
+      <!-- Accueil -->
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'accueil' %}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+            <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1">Accueil</span>
+        </a>
+      </li>
 
-          <li class="nav-item mb-3">
-            <a class="nav-link text-white d-flex flex-column align-items-center" href="{% url 'changer_mot_de_passe' %}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
-              </svg>
-              <span class="d-none d-md-inline mt-1">Changer mot de passe</span>
-            </a>
-          </li>
-
-          <li class="nav-item  mb-2" style="margin-top: 250px;">
-            <h6 class="text-white d-flex flex-column align-items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-              </svg>
-              <span class="d-none d-md-inline mt-1">{{ user.first_name }} {{ user.last_name }}</span>
-            </h6>
-          </li>
-        </ul>
-      </div>
-    </nav>
+      <!-- Changer mot de passe -->
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'changer_mot_de_passe' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'changer_mot_de_passe' %}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1">Changer mot de passe</span>
+        </a>
+      </li>
+      <!-- Utilisateur -->
+      <li class="nav-item mb-2" style="margin-top: 250px;">
+        <h6 class="text-dark d-flex flex-column align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1">{{ user.first_name }} {{ user.last_name }}</span>
+        </h6>
+      </li>
+    </ul>
+  </div>
+</nav>
   </div>
 </div>
 <div>
-    <nav class="navbar navbar-expand-lg navbar-top-fixed position-fixed px-3" style="margin-left: 226px; background-color: rgb(243, 242, 242)">
+<nav class="navbar navbar-light navbar-top-fixed authenticated d-flex justify-content-end align-items-center" style="background-color: rgb(255, 253, 253); position: fixed; border: 2px solid #cecbcb;">
       <div>
-        <ul class="navbar-nav" style="margin-left: 940px;">
+        <ul class="navbar-nav">
           <li class="nav-item">
             <form method="post" action="{% url 'deconnexion' %}">
               {% csrf_token %}
@@ -199,13 +218,19 @@
     <div class="collapse navbar-collapse" id="navbarGuest" style=" margin-left: 300px;">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'accueil' %}">Accueil</a>
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'accueil' %}" style="font-size: large;">
+                    Accueil
+                  </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'login' %}">Connexion</a>
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'login' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'login' %}" style="font-size: large;">
+                    Connexion
+                  </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link btn btn-link btn-outline-primary" style="color: black;" href="{% url 'register' %}">Inscription</a>
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'register' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'register' %}" style="font-size: large;">
+                    Inscription
+                  </a>
         </li>
       </ul>
     </div>
@@ -224,7 +249,7 @@
 
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
-    <footer class="text-center">
+    <footer class="text-center" style="margin-top: auto; padding: 20px;">
         <h6 style="font-style: italic;">
             Copyright © 2025 MapTalibé.
         </h6>

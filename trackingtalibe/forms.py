@@ -4,17 +4,21 @@ from .models import CustomUser
 from .models import Enfant
 
 class InscriptionForm(UserCreationForm):
+    # Ajoute le champ role pour le POST
+    role = forms.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES,
+        required=True,
+        widget=forms.HiddenInput()
+    )
     nom_daara = forms.CharField(
         label="Nom du Daara",
         max_length=100,
         required=False
     )
 
-class InscriptionForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'nom_daara', 'email', 'téléphone', 'password1', 'password2']
-
+        fields = ['first_name', 'last_name', 'username', 'nom_daara', 'email', 'telephone', 'role', 'password1', 'password2']
         widgets = {
             'password1': forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
             'password2': forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
@@ -30,13 +34,17 @@ class InscriptionForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
+        # Préremplit le champ role avec la sélection
+        if role_selected:
+            self.fields['role'].initial = role_selected
         if role_selected != 'serigne':
             self.fields.pop('nom_daara')
 
 class EnfantForm(forms.ModelForm):
     class Meta:
         model = Enfant
-        fields = ['id_esp32', 'nom', 'prenom', 'date_naissance','provenance']
+        fields = ['id_esp32', 'nom', 'prenom', 'date_naissance', 'provenance']
+        # Retire 'daara' des champs
 
 
 

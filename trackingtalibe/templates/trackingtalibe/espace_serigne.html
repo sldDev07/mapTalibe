@@ -1,69 +1,73 @@
 {% extends 'trackingtalibe/base.html' %}
 {% block title %}Liste des enfants{% endblock %}
+
 {% block content %}
 <div class="container-fluid px-3" style="margin-top: 60px;">
-  <div class="row">
-    <div class="col-12 col-lg-10 offset-lg-1">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
 
       <h2 class="text-center">Espace de gestion - Daara {{ user.nom_daara }}</h2>
-      <h6 class="text-center">Bienvenue sur l'espace dédié à la gestion de vos talibés.</h6>
+      <h6 class="text-center mb-4">Bienvenue sur l'espace dédié à la gestion de vos talibés.</h6>
 
-      <div class="d-flex flex-wrap gap-2 my-3">
+      <!-- Boutons d'action -->
+      <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 justify-content-center mb-3">
         <a href="{% url 'ajouter_enfant' %}" class="btn btn-success">Ajouter un talibé</a>
         <a href="{% url 'gestion_associations' %}" class="btn btn-outline-primary">Gérer les demandes d’association</a>
       </div>
 
-      <div class="mb-3" style="max-width: 300px;">
+      <!-- Champ de recherche -->
+      <div class="mx-auto mb-3" style="max-width: 300px;">
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par Nom ou ID">
       </div>
 
-      <div class="shadow rounded p-2 mb-2" style="min-height: 370px; max-height: 400px; overflow-y: auto; overflow-x: auto; background-color: rgba(255, 255, 255, 0.9); font-size: small; min-width: max-content;">
-        <h6 class="mb-2 text-center">Liste de vos talibés</h6>
+      <!-- Tableau responsive -->
+      <div class="table-responsive shadow rounded p-3 mb-4 bg-white" style="min-height: 370px;">
+        <h6 class="text-center mb-3">Liste de vos talibés</h6>
+
         <div class="text-center mb-2">
-            <span class="badge bg-primary">
-                Nombre de talibés : {{ enfants|length }}
-            </span>
+          <span class="badge bg-primary">
+            Nombre de talibés : {{ enfants|length }}
+          </span>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark sticky-top">
-                    <tr>
-                        <th>ID Appareil</th>
-                        <th>Nom</th>
-                        <th>Prénom</th>
-                        <th>Date de naissance</th>
-                        <th>Provenance</th>
-                        <th>Position</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for enfant in enfants %}
-                    <tr>
-                        <td>{{ enfant.id_esp32 }}</td>
-                        <td>{{ enfant.nom }}</td>
-                        <td>{{ enfant.prenom }}</td>
-                        <td>{{ enfant.date_naissance }}</td>
-                        <td>{{ enfant.provenance }}</td>
-                        <td><a href="{% url 'suivre_enfant' enfant.id %}">Suivre</a></td>
-                        <td class="d-flex flex-wrap gap-1">
-                            <a href="{% url 'modifier_enfant' enfant.id %}" class="btn btn-warning btn-sm">Modifier</a>
-                            <a href="{% url 'supprimer_enfant' enfant.id %}" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Confirmer la suppression de {{ enfant.prenom }} {{ enfant.nom }} ?')">Supprimer</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">Aucun enfant enregistré pour l’instant.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+        <table class="table table-bordered table-striped table-hover align-middle">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th scope="col">ID Appareil</th>
+              <th scope="col">Nom</th>
+              <th scope="col">Prénom</th>
+              <th scope="col" class="d-none d-sm-table-cell">Date de naissance</th>
+              <th scope="col" class="d-none d-md-table-cell">Provenance</th>
+              <th scope="col">Position</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enfant in enfants %}
+            <tr>
+              <td>{{ enfant.id_esp32 }}</td>
+              <td>{{ enfant.nom }}</td>
+              <td>{{ enfant.prenom }}</td>
+              <td class="d-none d-sm-table-cell">{{ enfant.date_naissance }}</td>
+              <td class="d-none d-md-table-cell">{{ enfant.provenance }}</td>
+              <td><a href="{% url 'suivre_enfant' enfant.id %}">Suivre</a></td>
+              <td class="d-flex flex-column flex-sm-row gap-1">
+                <a href="{% url 'modifier_enfant' enfant.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                <a href="{% url 'supprimer_enfant' enfant.id %}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('Confirmer la suppression de {{ enfant.prenom }} {{ enfant.nom }} ?')">
+                   Supprimer</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">Aucun enfant enregistré pour l’instant.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
 
     </div>
   </div>
 </div>
 {% endblock %}
-

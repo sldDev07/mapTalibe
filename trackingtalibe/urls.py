@@ -20,7 +20,6 @@ urlpatterns = [
     path('enfants/ajouter/', views.ajouter_enfant, name='ajouter_enfant'),
     path('associer_par_code/', views.associer_par_code, name='associer_par_code'),
     path('api/enregistrer_position/', views.enregistrer_position, name='enregistrer_position'),
-    path('enfant/<int:enfant_id>/suivre/', views.suivre_enfant, name='suivre_enfant'),
     path('enfant/<int:enfant_id>/position/', views.get_position_enfant, name='get_position_enfant'),
     path('logout/', views.deconnexion_view, name='deconnexion'),
     path('enfants/<int:pk>/modifier/', views.modifier_enfant, name='modifier_enfant'),
@@ -35,4 +34,5 @@ urlpatterns = [
     path('demande/<int:demande_id>/refuser/', views.refuser_demande, name='refuser_demande'),
     path('dissocier/<int:enfant_id>/<int:utilisateur_id>/', views.dissocier_utilisateur, name='dissocier_utilisateur'),
     path('changer-mot-de-passe/', views.changer_mot_de_passe, name='changer_mot_de_passe'),
+    path('suivre-enfant/<int:enfant_id>/', views.suivre_enfant, name='suivre_enfant'),
 ]

@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
         ('parent', 'Parent'),
     ]
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    téléphone = models.CharField(max_length=20, blank=False, null=True)
+    telephone = models.CharField(max_length=20, blank=False, null=True)
     email=models.EmailField(blank=False, null=True, max_length=254, verbose_name='Adresse éléctronique')
     first_name=models.CharField(blank=False, null=True, max_length=100, verbose_name="Prénom")
     last_name=models.CharField(blank=False, null=True, max_length=100, verbose_name="Nom")
@@ -30,7 +30,16 @@ class DeviceToken(models.Model):
         super().save(*args, **kwargs)
 
 
+class Daara(models.Model):
+    # Relie le Daara à son Serigne Daara (CustomUser)
+    serigne = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='daaras')
+    nom = models.CharField(max_length=100)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    rayon_securite_metres = models.PositiveIntegerField(default=20)
 
+    def __str__(self):
+        return self.nom
 
 class Enfant(models.Model):
     nom = models.CharField(max_length=100)
@@ -42,7 +51,15 @@ class Enfant(models.Model):
     parents = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='enfants_parents', blank=True)
     parrains = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='enfants_parrains', blank=True)
     appareil = models.OneToOneField('Device', on_delete=models.SET_NULL, null=True, blank=True)
+    daara = models.ForeignKey('Daara', on_delete=models.CASCADE, related_name='enfants')
 
+
+    @property
+    def nom_daara(self):
+        # Retourne le nom du Daara lié au Serigne Daara
+        if self.daara and self.daara.serigne:
+            return self.daara.nom
+        return ""
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
