@@ -8,7 +8,6 @@
     min-height: 100vh;
     justify-content: center;
     align-items: center;
-    background-color: #f0f2f5a9;
     padding: 2rem;
     gap: 2rem;
     flex-wrap: wrap;
@@ -20,6 +19,8 @@
     padding: 2rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     width: 350px;
+    border-right: 3px solid #cd47e7;
+    border-left: 3px solid #cd47e7;
 }
 
 .login-box h3 {
@@ -29,12 +30,12 @@
     color: #333;
 }
 
-.login-box .btn-login {
-    background-color: #0015c3;
-    color: white;
-    font-weight: bold;
+.btn-blue-outline {
+    background-color: rgb(25, 0, 255);
+    color: #ffffff;
     border: none;
-}
+    font-weight: bold;
+  }
 
 .login-box .btn-login:hover {
     background-color: #000e9c;
@@ -58,6 +59,8 @@
     width: 350px;
     text-align: center;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-right: 3px solid #fc0808;
+    border-left: 3px solid #fc0808;
 }
 
 .welcome-box h2 {
@@ -69,6 +72,7 @@
     font-size: 1rem;
     margin-bottom: 2rem;
 }
+
 
 .welcome-box .btn-signup {
     background-color: white;
@@ -84,9 +88,15 @@
     background-color: #d9e6ff;
     color: #00128c;
 }
+  .btn-white-outline {
+    background-color: white;
+    color: #0126b0;
+    border: none;
+    font-weight: bold;
+  }
 </style>
 
-<div class="login-wrapper">
+<div class="login-wrapper mt-4">
     <!-- Partie connexion -->
     <div class="login-box">
         <h3>Connexion</h3>
@@ -100,7 +110,7 @@
                 </div>
                 <a href="{% url 'password_reset' %}" style="font-size: small; color: #1871f2;">Mot de passe oublie </a>
             </div>
-            <button type="submit" class="btn btn-login w-100 mt-2">
+            <button type="submit" class="btn btn-blue-outline w-100 mt-2 badge rounded-pill" style="font-size: large; border-bottom: 3px solid #cd47e7;">
                 <i class="bi bi-box-arrow-in-right"></i> Se connecter
             </button>
         </form>
@@ -115,7 +125,7 @@
             MapTalibé
         </h2>
         <p>Vous n'avez pas encore de compte ?</p>
-        <a href="{% url 'register' %}" class="btn btn-signup">S'inscrire</a>
+        <a href="{% url 'register' %}" class="btn btn-white-outline px-4 py-2 badge rounded-pill" style="font-size: large; border-bottom: 3px solid #cd47e7;">S'inscrire</a>
     </div>
 </div>
 {% endblock %}

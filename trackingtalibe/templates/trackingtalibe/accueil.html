@@ -32,21 +32,12 @@
         margin-bottom: 1rem;
     }
 
-    .accueil-button {
-        display: inline-block;
-        background-color: #2634f0;
-        color: rgb(255, 255, 255);
-        padding: 12px 24px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
-        margin-top: 1rem;
-    }
-
-    .accueil-button:hover {
-        background-color: #0289f7;
-    }
+  .btn-blue-outline {
+    background-color: rgb(25, 0, 255);
+    color: #ffffff;
+    border: none;
+    font-weight: bold;
+  }
 
     .accueil-image {
         flex: 1;
@@ -75,7 +66,7 @@
 </style>
 
 <div class="accueil-section">
-    <div class="accueil-text">
+    <div class="accueil-text justify-content-end">
         <h1 class="text-center" style="color: #3542f5;">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
                 <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
@@ -92,10 +83,10 @@
             Chaque jour, des milliers de talibés arpentent les rues, parfois loin de leurs daaras,
             exposés à des risques. Face à cela, nous avons imaginé une solution simple et efficace.
         </p>
-        <a href="{% url 'login' %}" class="accueil-button">Connectez-vous dès maintenant !</a>
+        <a href="{% url 'login' %}" class="btn btn-blue-outline badge rounded-pill" style=" font-size: large; border-bottom: 3px solid #cd47e7;">Connectez-vous dès maintenant !</a>
     </div>
 
-    <div class="accueil-image">
+    <div class="accueil-image badge" style="border: 3px solid #1100ff;">
         <img id="carousel-image" src="{% static 'images/talibe1.png' %}" alt="Talibe MapTalibé">
     </div>
 </div>

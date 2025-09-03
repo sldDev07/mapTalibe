@@ -2,42 +2,72 @@
 {% block title %}Liste des enfants{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-3" style="margin-top: 60px;">
+<!-- Styles responsive ciblés smartphone / tablette -->
+<style>
+  /* Comportement global du tableau en mobile : compact et scrollable */
+  .table-compact { font-size: 0.9rem; }
+  .table-compact th, .table-compact td { padding: .45rem .6rem; }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Header badge responsive */
+  .header-badge { background-color: rgba(209, 239, 241, 0.938); margin-top: 33px; border-bottom: 4px solid #070707; padding: .6rem 1rem; }
+
+  /* Recherche */
+  #searchInput { max-width: 200px; }
+
+  /* Ajustements pour petits écrans */
+  @media (max-width: 768px) {
+    .table-compact { font-size: .88rem; }
+    .table-compact th, .table-compact td { padding: .35rem .5rem; }
+    #searchInput { width: 61% !important; max-width: none !important; margin-bottom: .5rem; font-size: small; }
+    .header-badge {padding: .5rem .6rem; text-align: center; margin-top: 33px; width: 15rem; }
+    .table-responsive { padding: .6rem; min-height: 220px; }
+    .actions-compact .btn { padding: .28rem .45rem; font-size: .78rem; }
+    .badge-compte { width: 50% !important; max-width: none !important; margin-bottom: .5rem; font-size: .7rem; }
+  }
+
+  @media (max-width: 576px) {
+    .table-compact { font-size: .6rem; }
+    .table-compact th, .table-compact td { padding: .25rem .4rem; }
+    .table-responsive { min-height: 160px; }
+    .header-badge h4 { font-size: 0.75rem; margin-bottom: .15rem; }
+    .header-badge h6 { font-size: .55rem; margin:0; }
+    .actions-compact .btn { padding: .2rem .35rem; font-size: .4rem; }
+  }
+</style>
+
+<div class="header-badge badge">
+  <h4 style="color: rgb(0, 0, 0);">Espace de gestion - Daara {{ user.nom_daara }}</h4>
+  <h6 style="color: rgb(5, 5, 5);">Bienvenue sur l'espace dédié à la gestion de vos talibés.</h6>
+</div>
+
+<div class="container-fluid px-3">
   <div class="row justify-content-center">
     <div class="col-12 col-lg-10">
-
-      <h2 class="text-center">Espace de gestion - Daara {{ user.nom_daara }}</h2>
-      <h6 class="text-center mb-4">Bienvenue sur l'espace dédié à la gestion de vos talibés.</h6>
-
-      <!-- Boutons d'action -->
-      <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 justify-content-center mb-3">
-        <a href="{% url 'ajouter_enfant' %}" class="btn btn-success">Ajouter un talibé</a>
-        <a href="{% url 'gestion_associations' %}" class="btn btn-outline-primary">Gérer les demandes d’association</a>
-      </div>
-
-      <!-- Champ de recherche -->
-      <div class="mx-auto mb-3" style="max-width: 300px;">
-        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par Nom ou ID">
-      </div>
-
-      <!-- Tableau responsive -->
-      <div class="table-responsive shadow rounded p-3 mb-4 bg-white" style="min-height: 370px;">
-        <h6 class="text-center mb-3">Liste de vos talibés</h6>
-
-        <div class="text-center mb-2">
-          <span class="badge bg-primary">
+        <div class="mb-2 container-fluid" style="margin-top: 12px;">
+          <span class="badge-compte badge rounded-pill bg-light text-dark" style=" border-bottom: 2px solid #070707;">
             Nombre de talibés : {{ enfants|length }}
           </span>
         </div>
 
-        <table class="table table-bordered table-striped table-hover align-middle">
-          <thead class="table-dark sticky-top">
+      <!-- Champ de recherche : devient full-width sur mobile -->
+      <div class="mx-auto mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par Nom ou ID">
+      </div>
+
+      <!-- Tableau responsive : table-sm + table-compact -->
+      <div class="table-responsive shadow rounded p-3 mb-4" style="background-color: rgb(244, 247, 248);">
+        <h6 class="text-center mb-3">Liste de vos talibés</h6>
+
+        <table class="table table-sm table-bordered table-striped table-hover align-middle table-compact">
+          <thead class="sticky-top" style="background-color:whitesmoke;">
             <tr>
               <th scope="col">ID Appareil</th>
-              <th scope="col">Nom</th>
               <th scope="col">Prénom</th>
-              <th scope="col" class="d-none d-sm-table-cell">Date de naissance</th>
-              <th scope="col" class="d-none d-md-table-cell">Provenance</th>
+              <th scope="col">Nom</th>
+              <th scope="col">Provenance</th>
+              <th scope="col">Date de naissance</th>
               <th scope="col">Position</th>
               <th scope="col">Actions</th>
             </tr>
@@ -46,14 +76,14 @@
             {% for enfant in enfants %}
             <tr>
               <td>{{ enfant.id_esp32 }}</td>
-              <td>{{ enfant.nom }}</td>
               <td>{{ enfant.prenom }}</td>
-              <td class="d-none d-sm-table-cell">{{ enfant.date_naissance }}</td>
-              <td class="d-none d-md-table-cell">{{ enfant.provenance }}</td>
+              <td>{{ enfant.nom }}</td>
+              <td>{{ enfant.date_naissance }}</td>
+              <td>{{ enfant.provenance }}</td>
               <td><a href="{% url 'suivre_enfant' enfant.id %}">Suivre</a></td>
-              <td class="d-flex flex-column flex-sm-row gap-1">
-                <a href="{% url 'modifier_enfant' enfant.id %}" class="btn btn-warning btn-sm">Modifier</a>
-                <a href="{% url 'supprimer_enfant' enfant.id %}" class="btn btn-danger btn-sm"
+              <td class="d-flex flex-column flex-sm-row gap-1 actions-compact">
+                <a href="{% url 'modifier_enfant' enfant.id %}" class="btn btn-warning btn-sm badge rounded-pill" style="border-bottom: 2px solid #ff0000;">Modifier</a>
+                <a href="{% url 'supprimer_enfant' enfant.id %}" class="btn btn-danger btn-sm badge rounded-pill" style="border-bottom: 2px solid #fdf903;"
                    onclick="return confirm('Confirmer la suppression de {{ enfant.prenom }} {{ enfant.nom }} ?')">
                    Supprimer</a>
               </td>
@@ -70,4 +100,25 @@
     </div>
   </div>
 </div>
+
+<!-- JS pour la recherche (inchangé mais s'appuie sur le champ repositionné) -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('table tbody tr');
+
+    function normalize(text) {
+      return text ? text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() : '';
+    }
+
+    searchInput && searchInput.addEventListener('keyup', function () {
+      const searchTerm = normalize(this.value);
+      rows.forEach(row => {
+        const id_esp32 = normalize(row.children[0].innerText);
+        const nom = normalize(row.children[2].innerText);
+        row.style.display = ( id_esp32.includes(searchTerm) || nom.includes(searchTerm)) ? '' : 'none';
+      });
+    });
+  });
+</script>
 {% endblock %}

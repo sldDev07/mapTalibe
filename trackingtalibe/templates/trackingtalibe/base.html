@@ -122,57 +122,86 @@
 </style>
 
 </head>
-<body class="d-flex flex-column min-vh-100" style="background-image: url('{% static 'images/fonds.jpg' %}');">
+<body class="d-flex flex-column min-vh-100" style="background-color: #aaa699;">
     {% if user.is_authenticated %}
 <div class="container-fluid">
   <div class="row">
-    <nav class="navbar-nav col-2 col-md-2 sidebar px-2" style="min-height: 100vh; position: fixed; background-color: rgb(255, 255, 255); border: 2px solid #cecbcb;"">
+    <nav class="navbar-nav col-2 col-md-2 sidebar px-2 badge" style="background-color: rgba(209, 239, 241, 0.938); min-height: 100vh; position:fixed; border-right: 2px solid #000000"">
   <div class="position-sticky pt-4 text-center">
-    <a href="{% url 'redirection_espace' %}" class="d-flex flex-column align-items-center text-decoration-none text-dark mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+    <a href="{% url 'redirection_espace' %}" class="d-flex flex-column align-items-center text-decoration-none text-blue mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
       </svg>
-      <span class="d-none d-md-inline mt-1" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: #3542f5; font-size:x-large;">MapTalibé</span>
+      <span class="d-none d-md-inline" style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; color: #045cff; font-size:xx-large;"><strong style="color: red;">Map</strong><strong>Talibé</strong></span>
     </a>
-    <ul class="nav flex-column text-dark" style="font-size: small;">
+    <ul class="nav flex-column text-white" style="font-size: small;">
 
       <!-- Tableau de bord -->
       <li class="nav-item mb-3">
-        <a class="nav-link d-flex flex-column align-items-center {% if active_page == 'dashboard' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'redirection_espace' %}">
+        <a class="nav-link d-flex flex-column align-items-center {% if active_page == 'dashboard' %}active text-dark badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'redirection_espace' %}" style=" {% if active_page == 'dashboard' %} font-size:small; border-bottom: 3px solid #cd47e7; color: #cd47e7;{% endif %};">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-columns-gap" viewBox="0 0 16 16">
             <path d="M6 1v3H1V1zM1 0a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1zm14 12v3h-5v-3zm-5-1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1zM6 8v7H1V8zM1 7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm14-6v7h-5V1zm-5-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1z"/>
           </svg>
-          <span class="d-none d-md-inline mt-1">Tableau de bord</span>
+          <span class="d-none d-md-inline mt-1"><strong>Tableau de bord</strong></span>
         </a>
       </li>
 
       <!-- Accueil -->
       <li class="nav-item mb-3">
-        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'accueil' %}">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active text-dark badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'accueil' %}" style=" {% if request.resolver_match.url_name == 'accueil' %} font-size: small; border-bottom: 3px solid #cd47e7; color: #cd47e7;{% endif %};">
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
             <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
           </svg>
-          <span class="d-none d-md-inline mt-1">Accueil</span>
+          <span class="d-none d-md-inline mt-1"><strong>Accueil</strong></span>
         </a>
       </li>
-
+      {% if user.role == 'serigne' %}
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'gestion_associations' %}active text-dark badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'gestion_associations' %}" style=" {% if request.resolver_match.url_name == 'gestion_associations' %} font-size: small; border-bottom: 3px solid #cd47e7; color: #cd47e7; {% endif %};">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-envelope-plus-fill" viewBox="0 0 16 16">
+            <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.026A2 2 0 0 0 2 14h6.256A4.5 4.5 0 0 1 8 12.5a4.49 4.49 0 0 1 1.606-3.446l-.367-.225L8 9.586zM16 4.697v4.974A4.5 4.5 0 0 0 12.5 8a4.5 4.5 0 0 0-1.965.45l-.338-.207z"/>
+            <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1"><strong>Gestion Demandes</strong></span>
+        </a>
+      </li>
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'ajouter_enfant' %}active text-dark badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'ajouter_enfant' %}" style=" {% if request.resolver_match.url_name == 'ajouter_enfant' %} font-size: small; border-bottom: 3px solid #cd47e7; color: #cd47e7; {% endif %};">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-plus" viewBox="0 0 16 16">
+            <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1"><strong>Ajouter un talibé</strong></span>
+        </a>
+      </li>
+      {% else %}
+      <li class="nav-item mb-3">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'associer_par_code' %}active text-dark badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'associer_par_code' %}" style="{% if request.resolver_match.url_name == 'associer_par_code' %} font-size: small; border-bottom: 3px solid #cd47e7; color: #cd47e7; {% endif %};">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-link-45deg" viewBox="0 0 16 16">
+            <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/>
+            <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/>
+          </svg>
+          <span class="d-none d-md-inline mt-1"><strong>S'associer à un enfant</strong></span>
+        </a>
+      </li>
+      {% endif %}
       <!-- Changer mot de passe -->
       <li class="nav-item mb-3">
-        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'changer_mot_de_passe' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'changer_mot_de_passe' %}">
+        <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'changer_mot_de_passe' %}active badge bg-light rounded-pill fw-bold{% else %}text-dark btn btn-outline-light badge rounded-pill{% endif %}" href="{% url 'changer_mot_de_passe' %}" style=" {% if request.resolver_match.url_name == 'changer_mot_de_passe' %} font-size: small; border-bottom: 3px solid #cd47e7; color: #cd47e7; {% endif %};">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
           </svg>
-          <span class="d-none d-md-inline mt-1">Changer mot de passe</span>
+          <span class="d-none d-md-inline mt-1"><strong>Changer mot de passe</strong></span>
         </a>
       </li>
       <!-- Utilisateur -->
-      <li class="nav-item mb-2" style="margin-top: 250px;">
+      <li class="nav-item mb-2" style="margin-top: 80px;">
         <h6 class="text-dark d-flex flex-column align-items-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
             <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
           </svg>
-          <span class="d-none d-md-inline mt-1">{{ user.first_name }} {{ user.last_name }}</span>
+          <span class="d-none d-md-inline mt-1"><strong> {{ user.first_name }} {{ user.last_name }}</strong></span>
         </h6>
       </li>
     </ul>
@@ -181,18 +210,18 @@
   </div>
 </div>
 <div>
-<nav class="navbar navbar-light navbar-top-fixed authenticated d-flex justify-content-end align-items-center" style="background-color: rgb(255, 253, 253); position: fixed; border: 2px solid #cecbcb;">
+<nav class="navbar navbar-light badge navbar-top-fixed authenticated d-flex justify-content-end align-items-center" style="background-color: rgba(209, 239, 241, 0.938); position: fixed; height: 4rem; border-bottom: 2px solid #000000">
       <div>
         <ul class="navbar-nav">
           <li class="nav-item">
             <form method="post" action="{% url 'deconnexion' %}">
               {% csrf_token %}
-              <button type="submit" class="nav-link text-dark btn btn-link btn-outline-info">
-                Déconnexion
+              <button type="submit" class="nav-link btn btn-outline-light mx-3 badge rounded-pill" style="font-size:medium; border-bottom: 3px solid #cd47e7; color: #cd47e7;">
+                <strong>Déconnexion
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
                   <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-                </svg>
+                </svg></strong> 
               </button>
             </form>
           </li>
@@ -201,34 +230,34 @@
     </nav>
 </div>
    {% else %}
-<nav class="navbar navbar-expand-lg navbar-top-fixed position-fixed w-100 px-3" style="top: 0; z-index: 1050; background-color: rgb(243, 242, 242);">
+<nav class="navbar navbar-expand-lg navbar-dark badge navbar-top-fixed position-fixed w-100 px-3" style="top: 0; z-index: 1050; background-color: rgba(209, 239, 241, 0.938); border-bottom: 2px solid #000000; height: 4rem;">
   <div class="container-fluid justify-content-between align-items-center">
 
-    <a class="navbar-brand d-flex align-items-center btn btn-link btn-outline-primary" href="{% url 'accueil' %}" style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; color: #3542f5;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+    <a class="navbar-brand d-flex align-items-center"  style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; color: #0011ff; font-size:larger">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
       </svg>
-      <span class="ms-1" style="font-size: x-large;">MapTalibé</span>
+      <span class="ms-1" style="font-size: xx-large;"><strong style="color: red;">Map</strong><strong>Talibé</strong></span>
     </a>
 
-    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGuest" aria-controls="navbarGuest" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler ms-auto bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarGuest" aria-controls="navbarGuest" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarGuest" style=" margin-left: 300px;">
+    <div class="collapse navbar-collapse badge" id="navbarGuest" style="background-color: rgba(209, 239, 241, 0.938);">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'accueil' %}" style="font-size: large;">
+        <li class="nav-item btn btn-outline-light mx-3 badge rounded-pill" style=" border-bottom: 3px solid #cd47e7">
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'accueil' %}active badge rounded-pill text-dark fw-bold{% endif %}" href="{% url 'accueil' %}" style="font-size: large; color: #cd47e7;">
                     Accueil
                   </a>
         </li>
-        <li class="nav-item">
-                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'login' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'login' %}" style="font-size: large;">
+        <li class="nav-item btn btn-outline-light mx-3 badge rounded-pill" style=" border-bottom: 3px solid #cd47e7">
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'login' %}active badge rounded-pill text-dark fw-bold{% endif %}" href="{% url 'login' %}" style="font-size: large; color: #cd47e7;">
                     Connexion
                   </a>
         </li>
-        <li class="nav-item">
-                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'register' %}active text-primary fw-bold{% else %}text-dark{% endif %}" href="{% url 'register' %}" style="font-size: large;">
+        <li class="nav-item btn btn-outline-light mx-3 badge rounded-pill" style=" border-bottom: 3px solid #cd47e7">
+                  <a class="nav-link d-flex flex-column align-items-center {% if request.resolver_match.url_name == 'register' %}active badge rounded-pill text-dark fw-bold{% endif %}" href="{% url 'register' %}" style="font-size: large; color: #cd47e7;">
                     Inscription
                   </a>
         </li>
@@ -250,7 +279,7 @@
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
     <footer class="text-center" style="margin-top: auto; padding: 20px;">
-        <h6 style="font-style: italic;">
+        <h6 style="font-style: italic; color: rgb(0, 0, 0);">
             Copyright © 2025 MapTalibé.
         </h6>
     </footer>

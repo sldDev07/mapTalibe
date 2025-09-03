@@ -2,81 +2,129 @@
 {% block title %}Gestion des associations{% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
-  <div class="col-lg-10 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-    
-    <!-- 🔗 Bloc : demandes en attente -->
-    <h4 class="text-center mb-3 fw-bold text-primary">Demandes d’association en attente</h4>
-    {% if demandes %}
-      <div class="table-responsive mb-4">
-        <table class="table table-bordered table-hover table-sm text-center align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Nom de l’enfant</th>
-              <th>Demandeur</th>
-              <th>Rôle</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for demande in demandes %}
+<!-- Styles responsive inspirés de espace_serigne.html -->
+<style>
+  .table-compact { font-size: 0.95rem; }
+  .table-compact th, .table-compact td { padding: .45rem .6rem; }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+
+  @media (max-width: 768px) {
+    .table-compact { font-size: .88rem; }
+    .table-compact th, .table-compact td { padding: .35rem .5rem; }
+    .table-responsive { padding: .6rem; min-height: 220px; }
+    .actions-compact { flex-direction: column; align-items: stretch; gap: .4rem; }
+    .actions-compact .btn { width: 100%; font-size: x-small; }
+    .size-h4{font-size: medium;}
+  }
+
+  @media (max-width: 576px) {
+    .table-compact { font-size: .78rem; }
+    .table-compact th, .table-compact td { padding: .25rem .4rem; }
+    .table-responsive { min-height: 160px; }
+  }
+</style>
+<div class="container px-3" style="margin-top: 100px;">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 p-3" style="background: #ffffff; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.06);">
+
+      <!-- 🔗 Bloc : demandes en attente -->
+      <h4 class="text-center mb-3 fw-bold text-primary size-h4">Demandes d’association en attente</h4>
+      {% if demandes %}
+        <div class="table-responsive mb-4">
+          <table class="table table-sm table-bordered table-hover table-compact text-center align-middle">
+            <thead class="table-light">
               <tr>
-                <td>{{ demande.enfant.id_esp32 }}</td>
-                <td>{{ demande.enfant.prenom }} {{ demande.enfant.nom }}</td>
-                <td>{{ demande.utilisateur.first_name }} {{ demande.utilisateur.last_name }}</td>
-                <td>{{ demande.utilisateur.get_role_display }}</td>
-                <td>
-                  <a href="{% url 'accepter_demande' demande.id %}" class="btn btn-success btn-sm">Accepter</a>
-                  <a href="{% url 'refuser_demande' demande.id %}" class="btn btn-danger btn-sm">Refuser</a>
-                </td>
+                <th>ID</th>
+                <th>Nom de l’enfant</th>
+                <th>Demandeur</th>
+                <th>Rôle</th>
+                <th>Action</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <p class="text-center text-muted mb-4">Aucune demande d'association en attente.</p>
-    {% endif %}
+            </thead>
+            <tbody>
+              {% for demande in demandes %}
+                <tr>
+                  <td>{{ demande.enfant.id_esp32 }}</td>
+                  <td>{{ demande.enfant.prenom }} {{ demande.enfant.nom }}</td>
+                  <td>{{ demande.utilisateur.first_name }} {{ demande.utilisateur.last_name }}</td>
+                  <td>{{ demande.utilisateur.get_role_display }}</td>
+                  <td class="actions-compact d-flex justify-content-center">
+                    <a href="{% url 'accepter_demande' demande.id %}" class="btn btn-success btn-sm">Accepter</a>
+                    <a href="{% url 'refuser_demande' demande.id %}" class="btn btn-danger btn-sm">Refuser</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-center text-muted mb-4">Aucune demande d'association en attente.</p>
+      {% endif %}
 
-    <hr>
+      <hr>
 
-    <!-- ✅ Bloc : utilisateurs associés -->
-    <h4 class="text-center mb-3 fw-bold text-primary">Utilisateurs associés à vos talibés</h4>
-    {% if associations %}
-      <div class="table-responsive mb-3">
-        <table class="table table-bordered table-hover table-sm text-center align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th>
-              <th>Nom de l’enfant</th>
-              <th>Utilisateur</th>
-              <th>Rôle</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for assoc in associations %}
+      <!-- ✅ Bloc : utilisateurs associés -->
+      <h4 class="text-center mb-3 fw-bold text-primary size-h4">Utilisateurs associés à vos talibés</h4>
+      {% if associations %}
+        <div class="table-responsive mb-3">
+          <table class="table table-sm table-bordered table-hover table-compact text-center align-middle">
+            <thead class="table-light">
               <tr>
-                <td>{{ assoc.enfant.id_esp32 }}</td>
-                <td>{{ assoc.enfant.prenom }} {{ assoc.enfant.nom }}</td>
-                <td>{{ assoc.utilisateur.first_name }} {{ assoc.utilisateur.last_name }}</td>
-                <td>{{ assoc.utilisateur.get_role_display }}</td>
-                <td>
-                  <form method="post" action="{% url 'dissocier_utilisateur' assoc.enfant.id assoc.utilisateur.id %}" onsubmit="return confirm('Confirmer la dissociation ?')">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning btn-sm">Dissocier</button>
-                  </form>
-                </td>
+                <th>ID</th>
+                <th>Nom de l’enfant</th>
+                <th>Utilisateur</th>
+                <th>Rôle</th>
+                <th>Action</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <p class="text-center text-muted">Aucune association active.</p>
-    {% endif %}
+            </thead>
+            <tbody>
+              {% for assoc in associations %}
+                <tr>
+                  <td>{{ assoc.enfant.id_esp32 }}</td>
+                  <td>{{ assoc.enfant.prenom }} {{ assoc.enfant.nom }}</td>
+                  <td>{{ assoc.utilisateur.first_name }} {{ assoc.utilisateur.last_name }}</td>
+                  <td>{{ assoc.utilisateur.get_role_display }}</td>
+                  <td class="actions-compact d-flex justify-content-center">
+                    <form method="post" action="{% url 'dissocier_utilisateur' assoc.enfant.id assoc.utilisateur.id %}" onsubmit="return confirm('Confirmer la dissociation ?')">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-warning btn-sm">Dissocier</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-center text-muted">Aucune association active.</p>
+      {% endif %}
 
+    </div>
   </div>
 </div>
+
+<!-- JS de recherche léger (optionnel, utile sur mobile) -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('table tbody tr');
+
+    function normalize(text) {
+      return text ? text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() : '';
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function () {
+        const term = normalize(this.value);
+        rows.forEach(row => {
+          const enfant = normalize(row.children[1].innerText || '');
+          const user = normalize(row.children[2].innerText || '');
+          row.style.display = (enfant.includes(term) || user.includes(term)) ? '' : 'none';
+        });
+      });
+    }
+  });
+</script>
 {% endblock %}

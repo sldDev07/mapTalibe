@@ -2,16 +2,16 @@
 {% block title %}Suivi de {{ enfant.nom }} {{ enfant.prenom }}{% endblock %}
 
 {% block content %}
-<h4 class="text-center" style="margin-top: 60px;">Suivi de {{ enfant.nom }} {{ enfant.prenom }}</h4>
+<h4 class="text-center" style="margin-top: 60px;">Suivi de {{ enfant.prenom }} {{ enfant.nom }} </h4>
 
 <div id="alerte-securite" class="alert alert-danger text-center fw-bold" style="display: none;">
-    ⚠️ Alerte : {{ enfant.nom }} {{ enfant.prenom }} est en dehors du périmètre de sécurité !
+    ⚠️ Alerte : {{ enfant.prenom }} {{ enfant.nom }}  est en dehors du périmètre de sécurité !
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<div id="map" class="container" style="height: 500px; border: 2px solid #050505; margin-bottom: 4rem; width: 80%;"></div>
+<div id="map" class="container" style="height: 500px; border: 3px solid #050505; margin-bottom: 4rem; width: 80%;"></div>
 
 <script>
     var enfantId = {{ enfant.id }};
@@ -28,7 +28,7 @@
         var map = L.map('map').setView([enfantLat, enfantLon], 18);
 
         // 🗺️ Tuile satellite Mapbox
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
             id: 'mapbox/satellite-streets-v12',
             tileSize: 512,
             zoomOffset: -1,

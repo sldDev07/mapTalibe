@@ -1,20 +1,17 @@
 {
   "test": {
-    "latitude": 0,
-    "longitude": 0,
-    "timestamp": "2025-07-28T09:31:06.790691",
-    "alert_sent": false
+    "latitude": 14.692425,
+    "longitude": -16.466784,
+    "timestamp": "2025-08-31T01:00:00.071202"
   },
   "78:42:1C:6C:B2:54": {
-    "latitude": 14.69714737,
-    "longitude": -16.47735977,
-    "timestamp": "2025-07-28T10:59:55.058742",
-    "alert_sent": false
+    "latitude": 14.692425,
+    "longitude": -16.466784,
+    "timestamp": "2025-08-31T01:00:00.071202"
   },
-    "78:42:1C:6C:B2:55": {
-    "latitude": 14.69714737,
-    "longitude": -16.47735977,
-    "timestamp": "2025-07-28T10:59:55.058742",
-    "alert_sent": false
+  "78:42:1C:6C:B2:55": {
+    "latitude": 14.692425,
+    "longitude": -16.466784,
+    "timestamp": "2025-08-31T01:00:00.071202"
   }
 }

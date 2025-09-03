@@ -12,8 +12,17 @@
     min-height: 100vh;
     gap: 2rem;
     padding: 2rem;
-    background-color: #f0f2f5b9;
+}
+  .btn-blue-outline {
+    background-color: rgb(25, 0, 255);
+    color: #ffffff;
+    border: none;
+    font-weight: bold;
   }
+
+.register-box .btn-register:hover {
+    background-color: #000e9c;
+}
 
   .register-box {
     background: #fff;
@@ -22,6 +31,9 @@
     flex: 1 1 550px;
     max-width: 540px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-right: 3px solid #cd47e7;
+    border-left: 3px solid #cd47e7;
+    margin-top: 6px;
   }
 
   .welcome-box {
@@ -33,6 +45,8 @@
     max-width: 400px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-right: 3px solid #fc0808;
+    border-left: 3px solid #fc0808;
   }
 
   .welcome-box h2 {
@@ -100,7 +114,7 @@
       </div>
 
       <div class="d-grid">
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
+        <button type="submit" class=" btn btn-blue-outline badge rounded-pill" style="font-size: large; border-bottom: 3px solid #cd47e7;">S'inscrire</button>
         <p class="text-center mt-2">ou</p>
         <a href="{% url 'login' %}" class="text-center">Se connecter</a>
       </div>
@@ -120,7 +134,7 @@
             MapTalibé
     </h2>
     <p>Merci de rejoindre la communauté MapTalibé</p>
-    <a href="{% url 'accueil' %}" class="btn btn-white-outline px-4 py-2">Accueil</a>
+    <a href="{% url 'accueil' %}" class="btn btn-white-outline px-4 py-2 badge rounded-pill" style="font-size: large; border-bottom: 3px solid #cd47e7;">Accueil</a>
   </div>
 </div>
 {% endblock %}

@@ -2,8 +2,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<style>
+  .btn-blue-outline {
+    background-color: rgb(25, 0, 255);
+    color: #ffffff;
+    border: none;
+    font-weight: bold;
+  }
+</style>
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
-  <div class="col-md-6 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+  <div class="col-md-6 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-left: 3px solid #cd47e7; border-right: 3px solid #cd47e7;">
     <h3 class="text-center mb-4" style="font-weight: bold; color: #2b2b2b;">Changer le mot de passe</h3>
     
     <form method="post">
@@ -21,7 +29,7 @@
       {% endfor %}
 
       <div class="d-grid mt-4">
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-blue-outline badge rounded-pill" style=" border-bottom: 3px solid #cd47e7; font-size: medium;">
           Enregistrer les modifications
         </button>
       </div>

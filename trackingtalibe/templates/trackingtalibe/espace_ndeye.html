@@ -1,45 +1,66 @@
 {% extends 'trackingtalibe/base.html' %}
 
 {% block content %}
-<div class="container-fluid px-3" style="margin-top: 60px;">
+<style>
+  /* Comportement global du tableau en mobile : compact et scrollable */
+  .table-compact { font-size: 0.9rem; }
+  .table-compact th, .table-compact td { padding: .45rem .6rem; }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Header badge responsive */
+  .header-badge { background-color: rgba(209, 239, 241, 0.938); margin-top: 33px; border-bottom: 4px solid #070707; padding: .6rem 1rem; }
+
+  /* Recherche */
+  #searchInput { max-width: 200px; }
+
+  /* Ajustements pour petits écrans */
+  @media (max-width: 768px) {
+    .table-compact { font-size: .88rem; }
+    .table-compact th, .table-compact td { padding: .35rem .5rem; }
+    #searchInput { width: 65% !important; max-width: none !important; margin-bottom: .5rem; font-size: x-small; }
+    .header-badge {padding: .5rem .6rem; text-align: center; margin-top: 33px; width: 15rem; }
+    .table-responsive { padding: .6rem; min-height: 220px; }
+    .actions-compact .btn { padding: .28rem .45rem; font-size: .78rem; }
+    .badge-compte { width: 50% !important; max-width: none !important; margin-bottom: .5rem; font-size: .7rem; }
+  }
+
+  @media (max-width: 576px) {
+    .table-compact { font-size: .5rem; }
+    .table-compact th, .table-compact td { padding: .25rem .4rem; }
+    .table-responsive { min-height: 160px; }
+    .header-badge h5 { font-size: 0.6rem; margin-bottom: .15rem; }
+    .header-badge p { font-size: .55rem; margin:0; }
+    .actions-compact .btn { padding: .2rem .35rem; font-size: .4rem; }
+  }
+  </style>
+<div class="header-badge badge " style="background-color: rgba(209, 239, 241, 0.938); margin-top: 33px; border-bottom: 4px solid #070707;">
+  <h5 style="color: rgb(0, 0, 0);">Bienvenue sur l'espace dédié au suivi des talibés</h5>
+  <p style="color: rgb(0, 0, 0);">Connecté en tant que Ndèye Daara </p>
+</div>
+
+<div class="container-fluid px-3" style="margin-top: 15px;">
   <div class="row justify-content-center">
     <div class="col-12 col-lg-10">
 
-      <h3 class="text-center mb-3">Bienvenue sur l'espace dédié au suivi des talibés</h3>
-
-      <!-- Bouton association -->
-      <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center mb-1">
-        <a href="{% url 'associer_par_code' %}" class="btn btn-primary">
-          Demander une association à un enfant
-        </a>
-      </div>
-      <div class="text-center">
-        <small class="text-muted">⚠️ L'association doit être validée par le Serigne Daara</small>
-      </div>
-
-      <!-- Barre de recherche -->
-      <div class="mx-auto mt-3 mb-2" style="max-width: 300px;">
-        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par nom ou prénom">
-      </div>
-
-      <!-- Compteur -->
-      <div class="text-center mb-2">
-        <span class="badge bg-primary">
+      <div class="mb-2" style="margin-top: 80px;">
+        <span class="badge-compte badge rounded-pill bg-light text-dark" style="border-bottom: 2px solid #070707;">
           Nombre d'enfants : {{ enfants|length }}
         </span>
       </div>
 
       <!-- Tableau responsive -->
       <div class="table-responsive shadow rounded p-3 bg-white" style="min-height: 350px;">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par nom ou prénom">
         <h6 class="text-center mb-3">Liste des enfants que vous pouvez suivre</h6>
 
-        <table class="table table-striped table-hover align-middle text-center">
-          <thead class="table-dark sticky-top">
+        <table class="table-compact table table-striped table-hover align-middle text-center">
+          <thead class="table-bold sticky-top">
             <tr>
               <th>Nom</th>
               <th>Prénom</th>
-              <th class="d-none d-sm-table-cell">Date de naissance</th>
-              <th class="d-none d-md-table-cell">Résidence</th>
+              <th>Date de naissance</th>
+              <th>Résidence</th>
               <th>Suivi</th>
             </tr>
           </thead>
@@ -48,9 +69,9 @@
             <tr>
               <td>{{ enfant.nom }}</td>
               <td>{{ enfant.prenom }}</td>
-              <td class="d-none d-sm-table-cell">{{ enfant.date_naissance }}</td>
-              <td class="d-none d-md-table-cell">Daara {{ enfant.responsable.nom_daara }}</td>
-              <td><a href="{% url 'suivre_enfant' enfant.id %}" class="btn btn-sm btn-outline-primary">Suivre</a></td>
+              <td>{{ enfant.date_naissance }}</td>
+              <td>Daara {{ enfant.responsable.nom_daara }}</td>
+              <td><a href="{% url 'suivre_enfant' enfant.id %}" class="actions-compact badge rounded-pill text-primary btn btn-sm btn-outline-info">Suivre</a></td>
             </tr>
             {% empty %}
             <tr>
@@ -64,7 +85,7 @@
   </div>
 </div>
 
-<!-- JS pour la recherche -->
+<!-- Recherche -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');

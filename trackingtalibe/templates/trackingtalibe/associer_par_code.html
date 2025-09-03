@@ -2,8 +2,16 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<style>
+  .btn-blue-outline {
+    background-color: rgb(25, 0, 255);
+    color: #ffffff;
+    border: none;
+    font-weight: bold;
+  }
+</style>
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
-  <div class="col-md-6 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+  <div class="col-md-6 p-4" style="background: #ffffff; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-left: 3px solid #cd47e7; border-right: 3px solid #cd47e7;">
     <h3 class="text-center mb-3" style="font-weight: bold; color: #2b2b2b;">🔐 S'associer à un enfant</h3>
     <p class="text-center text-muted" style="font-size: 0.95rem;">
       Entrez l’<strong>ID de l’enfant</strong> pour soumettre une demande au Serigne Daara.
@@ -24,7 +32,7 @@
       {% endfor %}
 
       <div class="d-grid mt-4">
-        <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+        <button type="submit" class="btn btn-blue-outline badge rounded-pill" style="font-size: medium; border-bottom: 3px solid #cd47e7;">Envoyer la demande</button>
       </div>
     </form>
 
@@ -33,7 +41,7 @@
     <h6 class="text-center text-dark">📋 Vos demandes en attente</h6>
     <div class="table-responsive mt-2">
       <table class="table table-striped table-hover small text-center">
-        <thead class="table-dark sticky-top">
+        <thead class="table-light sticky-top">
           <tr>
             <th>Enfant</th>
             <th>Daara</th>
